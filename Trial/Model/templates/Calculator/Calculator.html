@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Blogs' %}">Blogs</a></li>
+            <li><a href="{% url 'Model' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Signup</a></li>
+        </ul>
+        
+    </nav>
+    <div class="container">
+        <form class="carbon-footprint-form">
+            <h1>Carbon footprint analyser</h1>
+            <h2>1. Mining Activities</h2>
+            <div class="form-group">
+                <label for="coal-production">Coal and types of production</label>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="anthracite">Anthracite</label>
+                        <input type="text" id="anthracite" name="anthracite">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-coking">Bituminous (Coking)</label>
+                        <input type="text" id="bituminous-coking" name="bituminous-coking">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-non-coking">Bituminous (Non-Coking)</label>
+                        <input type="text" id="bituminous-non-coking" name="bituminous-non-coking">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="subbituminous">Subbituminous</label>
+                        <input type="text" id="subbituminous" name="subbituminous">
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="lignite">Lignite</label>
+                        <input type="text" id="lignite" name="lignite">
+                    </div>
+                </div>
+            </div>
+            <h2>2. Equipments and fuel emissions</h2>
+            <div class="form-group">
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="diesel-machinery">Diesel Powered Machinery Used (Diesel in liters)</label>
+                        <input type="text" id="diesel-machinery" name="diesel-machinery">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="petrol-machinery">Petrol Powered Machinery (Petrol Used in liters)</label>
+                        <input type="text" id="petrol-machinery" name="petrol-machinery">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="explosives-used">Explosives Used (kgs)</label>
+                        <input type="text" id="explosives-used" name="explosives-used">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="electricity-used">Electricity Used (MWh)</label>
+                        <input type="text" id="electricity-used" name="electricity-used">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

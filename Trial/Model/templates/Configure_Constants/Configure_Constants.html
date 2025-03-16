@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configure Constants</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Configure_Constants_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="hamburger-menu">
+            <button class="hamburger-btn" onclick="toggleNavMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="nav-container" id="navMenu">
+            <ul class="nav-left">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="{% url 'Blogs' %}">Blogs</a></li>
+                <li><a href="{% url 'Model:Configure_Constants' %}">Carbon Footprint Analyser</a></li>
+            </ul>
+            <ul class="nav-right">
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Signup</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <form class="carbon-footprint-form">
+            <h1>Configure Constants</h1>
+            <h2>Coal</h2>
+            <div class="form-group">
+                <h3>Type of coal mine</h3>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="open-cast" name="mine-type" value="open-cast" required onclick="toggleMineFields()">
+                        <label for="open-cast">Open Cast Coal mine</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="underground" name="mine-type" value="underground" required onclick="toggleMineFields()">
+                        <label for="underground">Underground Coal Mine</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h3>Coal Type Conversion Factor for different types of coals</h3>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="anthracite">Anthracite</label>
+                        <input type="number" id="anthracite" name="anthracite" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-coking">Bituminous (Coking)</label>
+                        <input type="number" id="bituminous-coking" name="bituminous-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-non-coking">Bituminous (Non-Coking)</label>
+                        <input type="number" id="bituminous-non-coking" name="bituminous-non-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="subbituminous">Subbituminous</label>
+                        <input type="number" id="subbituminous" name="subbituminous" step="0.01" required>
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="lignite">Lignite</label>
+                        <input type="number" id="lignite" name="lignite" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="conversion-factor">Conversion Factor (add exact value)</label>
+                        <input type="number" id="conversion-factor" name="conversion-factor" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="exclusion-factor">Exclusion Factor (add exact value)</label>
+                        <input type="number" id="exclusion-factor" name="exclusion-factor" step="0.01" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3>Effective CO<sub>2</sub> Emissions factor</h3>
+                <h4>Carbon Content (CC) (Enter Carbon per mass unit energy in kg/GJ)</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="cc-anthracite">Anthracite</label>
+                        <input type="number" id="cc-anthracite" name="cc-anthracite" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cc-bituminous-coking">Bituminous (Coking)</label>
+                        <input type="number" id="cc-bituminous-coking" name="cc-bituminous-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cc-bituminous-non-coking">Bituminous (Non-Coking)</label>
+                        <input type="number" id="cc-bituminous-non-coking" name="cc-bituminous-non-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cc-subbituminous">Subbituminous</label>
+                        <input type="number" id="cc-subbituminous" name="cc-subbituminous" step="0.01" required>
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="cc-lignite">Lignite</label>
+                        <input type="number" id="cc-lignite" name="cc-lignite" step="0.01" required>
+                    </div>
+                </div>
+                
+                <h4>Carbon Oxidation Factor (COF)</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="cof-anthracite">Anthracite</label>
+                        <input type="number" id="cof-anthracite" name="cof-anthracite" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cof-bituminous-coking">Bituminous (Coking)</label>
+                        <input type="number" id="cof-bituminous-coking" name="cof-bituminous-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cof-bituminous-non-coking">Bituminous (Non-Coking)</label>
+                        <input type="number" id="cof-bituminous-non-coking" name="cof-bituminous-non-coking" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="cof-subbituminous">Subbituminous</label>
+                        <input type="number" id="cof-subbituminous" name="cof-subbituminous" step="0.01" required>
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="cof-lignite">Lignite</label>
+                        <input type="number" id="cof-lignite" name="cof-lignite" step="0.01" required>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Open Cast specific fields -->
+            <div id="open-cast-fields" class="form-group" style="display: none;">
+                <h3>Overburdened Removal</h3>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="avg-emission-factor">Average Emission Factor for diesel equipment (Emission/Tonnes of coal)</label>
+                        <input type="number" id="avg-emission-factor" name="avg-emission-factor" step="0.01">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Underground Coal Mine specific fields -->
+            <div id="underground-fields" class="form-group" style="display: none;">
+                <h3>Carbon stock loss</h3>
+                <h4>Methane emission factor</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="methane-anthracite">Anthracite</label>
+                        <input type="number" id="methane-anthracite" name="methane-anthracite" step="0.01">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="methane-bituminous-coking">Bituminous (Coking)</label>
+                        <input type="number" id="methane-bituminous-coking" name="methane-bituminous-coking" step="0.01">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="methane-bituminous-non-coking">Bituminous (Non-Coking)</label>
+                        <input type="number" id="methane-bituminous-non-coking" name="methane-bituminous-non-coking" step="0.01">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="methane-subbituminous">Subbituminous</label>
+                        <input type="number" id="methane-subbituminous" name="methane-subbituminous" step="0.01">
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="methane-lignite">Lignite</label>
+                        <input type="number" id="methane-lignite" name="methane-lignite" step="0.01">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="button">Save Constants</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleMineFields() {
+            const openCastFields = document.getElementById('open-cast-fields');
+            const undergroundFields = document.getElementById('underground-fields');
+            const openCastRadio = document.getElementById('open-cast');
+            const undergroundRadio = document.getElementById('underground');
+            
+            if (openCastRadio.checked) {
+                openCastFields.style.display = 'block';
+                undergroundFields.style.display = 'none';
+            } else if (undergroundRadio.checked) {
+                openCastFields.style.display = 'none';
+                undergroundFields.style.display = 'block';
+            } else {
+                openCastFields.style.display = 'none';
+                undergroundFields.style.display = 'none';
+            }
+        }
+        
+        function toggleNavMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('nav-active');
+        }
+        
+        // Run on page load to handle any pre-selected values
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleMineFields();
+        });
+    </script>
+</body>
+</html>

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Pages',
     'Blogs',
     'UserAuth',
+    'Model',
 ]
 
 MIDDLEWARE = [
@@ -124,7 +125,7 @@ STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'AuthApp/static'),
+    os.path.join(BASE_DIR, 'Model/static'),
 ]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-APPEND_SLASH=False
+APPEND_SLASH=True

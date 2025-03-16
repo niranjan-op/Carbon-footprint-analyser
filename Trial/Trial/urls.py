@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('Pages.urls'),name='home'),
     path('Blogs/',include('Blogs.urls'),name='Blogs'),
     path('UserAuth/',include('UserAuth.urls'),name='UserAuth'),
+    path('Model/', include('Model.urls'),name='Model'),
 ]

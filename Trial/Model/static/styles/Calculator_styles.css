@@ -1,0 +1,346 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    width: 85%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    overflow: hidden;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding-top: 30px;
+    min-height: 70px;
+    border-bottom: #77aaff 3px solid;
+}
+
+header a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+header ul {
+    padding: 0;
+    list-style: none;
+}
+
+header li {
+    float: left;
+    display: inline;
+    padding: 0 20px 0 20px;
+}
+
+header #branding {
+    float: left;
+}
+
+header #branding h1 {
+    margin: 0;
+}
+
+header nav {
+    float: right;
+    margin-top: 10px;
+}
+
+button, .button {
+    display: inline-block;
+    padding: 12px 25px;
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+button:hover, .button:hover {
+    background: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+button:active, .button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+footer {
+    background: #222;
+    color: #fff;
+    padding: 30px 0;
+    text-align: center;
+}
+
+footer p {
+    margin: 10px 0; 
+}
+
+/* Header & Navigation Styling */
+nav {
+    background: linear-gradient(to right, #1a1a1a, #333);
+    color: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+nav li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    transition: color 0.3s;
+    position: relative;
+}
+
+nav a:hover {
+    color: #4CAF50;
+}
+
+nav a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -3px;
+    left: 0;
+    background-color: #4CAF50;
+    transition: width 0.3s;
+}
+
+nav a:hover:after {
+    width: 100%;
+}
+
+.nav-right a {
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.nav-right a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                url('../images/carbon-footprint.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 1.5s;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    max-width: 700px;
+    margin-bottom: 2rem;
+    animation: fadeIn 2s;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    animation: fadeIn 2.5s;
+}
+
+.cta-button:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Content Sections */
+.section {
+    padding: 60px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #333;
+    position: relative;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background-color: #4CAF50;
+}
+
+.features {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.feature-card {
+    flex: 1;
+    min-width: 300px;
+    margin: 15px;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card h3 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    nav li {
+        margin: 5px 0;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .features {
+        flex-direction: column;
+    }
+
+    .carbon-footprint-form .sub-fields input {
+        flex: 1 1 100%;
+    }
+
+    .carbon-footprint-form .sub-field-pair, .carbon-footprint-form .sub-field-single {
+        flex: 1 1 100%;
+    }
+}
+
+/* Form Styling */
+.carbon-footprint-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.carbon-footprint-form h1, .carbon-footprint-form h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.carbon-footprint-form .form-group {
+    margin-bottom: 20px;
+}
+
+.carbon-footprint-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.carbon-footprint-form .sub-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.carbon-footprint-form .sub-field-pair {
+    flex: 1 1 calc(50% - 10px);
+}
+
+.carbon-footprint-form .sub-field-single {
+    flex: 1 1 100%;
+}
+
+.carbon-footprint-form .sub-fields input,
+.carbon-footprint-form .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
