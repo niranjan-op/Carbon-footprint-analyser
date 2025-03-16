@@ -14,7 +14,7 @@
             <li><a href="#">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
             <li><a href="{% url 'Blogs' %}">Blogs</a></li>
-            <li><a href="{% url 'Model' %}">Carbon Footprint Analyser</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
         </ul>
         <ul class="nav-right">
             <li><a href="{% url 'login' %}">Login</a></li>
@@ -24,30 +24,41 @@
     </nav>
     <div class="container">
         <form class="carbon-footprint-form">
+            <div class="config-notice">
+                <div class="notice-icon">⚙️</div>
+                <div class="notice-content">
+                    <h3>Customize Your Analysis!</h3>
+                    <p>For more accurate carbon footprint results tailored to your specific operations, please review and adjust the calculation constants before proceeding.</p>
+                    <a href="{% url 'Model:Configure_Constants' %}" class="config-button">
+                        <span class="button-text">Configure Constants</span>
+                        <span class="button-icon">→</span>
+                    </a>
+                </div>
+            </div>
             <h1>Carbon footprint analyser</h1>
             <h2>1. Mining Activities</h2>
             <div class="form-group">
-                <label for="coal-production">Coal and types of production</label>
+                <h3>Coal and types of production</h3>
                 <div class="sub-fields">
                     <div class="sub-field-pair">
-                        <label for="anthracite">Anthracite</label>
-                        <input type="text" id="anthracite" name="anthracite">
+                        <label for="anthracite">Anthracite (tonnes)</label>
+                        <input type="number" id="anthracite" name="anthracite">
                     </div>
                     <div class="sub-field-pair">
-                        <label for="bituminous-coking">Bituminous (Coking)</label>
-                        <input type="text" id="bituminous-coking" name="bituminous-coking">
+                        <label for="bituminous-coking">Bituminous (Coking) (tonnes)</label>
+                        <input type="number" id="bituminous-coking" name="bituminous-coking">
                     </div>
                     <div class="sub-field-pair">
-                        <label for="bituminous-non-coking">Bituminous (Non-Coking)</label>
-                        <input type="text" id="bituminous-non-coking" name="bituminous-non-coking">
+                        <label for="bituminous-non-coking">Bituminous (Non-Coking) (tonnes)</label>
+                        <input type="number" id="bituminous-non-coking" name="bituminous-non-coking">
                     </div>
                     <div class="sub-field-pair">
-                        <label for="subbituminous">Subbituminous</label>
-                        <input type="text" id="subbituminous" name="subbituminous">
+                        <label for="subbituminous">Subbituminous (tonnes)</label>
+                        <input type="number" id="subbituminous" name="subbituminous">
                     </div>
                     <div class="sub-field-single">
-                        <label for="lignite">Lignite</label>
-                        <input type="text" id="lignite" name="lignite">
+                        <label for="lignite">Lignite (tonnes)</label>
+                        <input type="number" id="lignite" name="lignite">
                     </div>
                 </div>
             </div>
@@ -55,20 +66,20 @@
             <div class="form-group">
                 <div class="sub-fields">
                     <div class="sub-field-pair">
-                        <label for="diesel-machinery">Diesel Powered Machinery Used (Diesel in liters)</label>
-                        <input type="text" id="diesel-machinery" name="diesel-machinery">
+                        <label for="diesel-machinery">Diesel Powered Machinery Used (liters)</label>
+                        <input type="number" id="diesel-machinery" name="diesel-machinery">
                     </div>
                     <div class="sub-field-pair">
-                        <label for="petrol-machinery">Petrol Powered Machinery (Petrol Used in liters)</label>
-                        <input type="text" id="petrol-machinery" name="petrol-machinery">
+                        <label for="petrol-machinery">Petrol Powered Machinery (liters)</label>
+                        <input type="number" id="petrol-machinery" name="petrol-machinery">
                     </div>
                     <div class="sub-field-pair">
-                        <label for="explosives-used">Explosives Used (kgs)</label>
-                        <input type="text" id="explosives-used" name="explosives-used">
+                        <label for="explosives-used">Explosives Used (kg)</label>
+                        <input type="number" id="explosives-used" name="explosives-used">
                     </div>
                     <div class="sub-field-pair">
                         <label for="electricity-used">Electricity Used (MWh)</label>
-                        <input type="text" id="electricity-used" name="electricity-used">
+                        <input type="number" id="electricity-used" name="electricity-used">
                     </div>
                 </div>
             </div>

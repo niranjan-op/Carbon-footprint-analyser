@@ -33,9 +33,9 @@
     <div class="container">
         <form class="carbon-footprint-form">
             <h1>Configure Constants</h1>
-            <h2>Coal</h2>
+            <h2>1. Coal</h2>
             <div class="form-group">
-                <h3>Type of coal mine</h3>
+                <h3> i) Type of coal mine</h3>
                 <div class="radio-group">
                     <div class="radio-item">
                         <input type="radio" id="open-cast" name="mine-type" value="open-cast" required onclick="toggleMineFields()">
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <h3>Coal Type Conversion Factor for different types of coals</h3>
+                <h3>ii) Coal Type Conversion Factor for different types of coals</h3>
                 <div class="sub-fields">
                     <div class="sub-field-pair">
                         <label for="anthracite">Anthracite</label>
@@ -82,8 +82,8 @@
             </div>
             
             <div class="form-group">
-                <h3>Effective CO<sub>2</sub> Emissions factor</h3>
-                <h4>Carbon Content (CC) (Enter Carbon per mass unit energy in kg/GJ)</h4>
+                <h3>iii) Effective CO<sub>2</sub> Emissions factor</h3>
+                <h4>a) Carbon Content (CC) (Enter Carbon per mass unit energy in kg/GJ)</h4>
                 <div class="sub-fields">
                     <div class="sub-field-pair">
                         <label for="cc-anthracite">Anthracite</label>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 
-                <h4>Carbon Oxidation Factor (COF)</h4>
+                <h4>b) Carbon Oxidation Factor (COF)</h4>
                 <div class="sub-fields">
                     <div class="sub-field-pair">
                         <label for="cof-anthracite">Anthracite</label>
@@ -130,11 +130,114 @@
                         <input type="number" id="cof-lignite" name="cof-lignite" step="0.01" required>
                     </div>
                 </div>
+                
+                <!-- Added Carbon stock loss section under Coal -->
+                <div id="carbon-stock-methane" style="display: none;">
+                    <h3>iv) Carbon Stock Loss - Methane Emission Factor</h3>
+                    <div class="sub-fields">
+                        <div class="sub-field-pair">
+                            <label for="methane-anthracite">Anthracite</label>
+                            <input type="number" id="methane-anthracite" name="methane-anthracite" step="0.01">
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="methane-bituminous-coking">Bituminous (Coking)</label>
+                            <input type="number" id="methane-bituminous-coking" name="methane-bituminous-coking" step="0.01">
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="methane-bituminous-non-coking">Bituminous (Non-Coking)</label>
+                            <input type="number" id="methane-bituminous-non-coking" name="methane-bituminous-non-coking" step="0.01">
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="methane-subbituminous">Subbituminous</label>
+                            <input type="number" id="methane-subbituminous" name="methane-subbituminous" step="0.01">
+                        </div>
+                        <div class="sub-field-single">
+                            <label for="methane-lignite">Lignite</label>
+                            <input type="number" id="methane-lignite" name="methane-lignite" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>2. Emission by equipments</h2>
+                <h4>i) Diesel Powered Machinery (Enter average emission per litre)</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="diesel-emission-factor">Emission Factor (kg CO₂/litre)</label>
+                        <input type="number" id="diesel-emission-factor" name="diesel-emission-factor" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="diesel-consumption-rate">Average Consumption Rate (litres/hour)</label>
+                        <input type="number" id="diesel-consumption-rate" name="diesel-consumption-rate" step="0.01" required>
+                    </div>
+                </div>
+                
+                <h4>ii) Petrol Powered Machinery (Enter average emission per litre)</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="petrol-emission-factor">Emission Factor (kg CO₂/litre)</label>
+                        <input type="number" id="petrol-emission-factor" name="petrol-emission-factor" step="0.01" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="petrol-consumption-rate">Average Consumption Rate (litres/hour)</label>
+                        <input type="number" id="petrol-consumption-rate" name="petrol-consumption-rate" step="0.01" required>
+                    </div>
+                </div>
+
+                <h4>iii) Explosives</h4>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label>Configure explosives and their emission factors</label>
+                        <button type="button" class="add-explosive-btn" onclick="addExplosiveField()">
+                            <i class="fas fa-plus"></i> Add Explosive
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="explosives-container">
+                    <!-- Explosive fields will be dynamically added here -->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>3. Electricity</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="grid-emission-factor">Grid Emission Factor (kg CO₂/kWh)</label>
+                        <input type="number" id="grid-emission-factor" name="grid-emission-factor" step="0.001" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>4. Transportation</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label>Configure transportation types and their emission factors</label>
+                        <button type="button" class="add-explosive-btn" onclick="addTransportField()">
+                            <i class="fas fa-plus"></i> Add Transport
+                        </button>
+                    </div>
+                </div>
+                <div id="transportation-container">
+                    <!-- Transport fields will be dynamically added here -->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>5. Carbon Sequestration Potential</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="carbon-sequestration-rate">Carbon Sequestration Rate (tCO₂/hectare/year)</label>
+                        <input type="number" id="carbon-sequestration-rate" name="carbon-sequestration-rate" step="0.01" required>
+                    </div>
+                </div>
             </div>
             
             <!-- Open Cast specific fields -->
             <div id="open-cast-fields" class="form-group" style="display: none;">
-                <h3>Overburdened Removal</h3>
+                <h2>6. Overburdened Removal</h2>
                 <div class="sub-fields">
                     <div class="sub-field-single">
                         <label for="avg-emission-factor">Average Emission Factor for diesel equipment (Emission/Tonnes of coal)</label>
@@ -145,28 +248,11 @@
             
             <!-- Underground Coal Mine specific fields -->
             <div id="underground-fields" class="form-group" style="display: none;">
-                <h3>Carbon stock loss</h3>
-                <h4>Methane emission factor</h4>
+                <h2>6. Underground Mining Specific Factors</h2>
                 <div class="sub-fields">
-                    <div class="sub-field-pair">
-                        <label for="methane-anthracite">Anthracite</label>
-                        <input type="number" id="methane-anthracite" name="methane-anthracite" step="0.01">
-                    </div>
-                    <div class="sub-field-pair">
-                        <label for="methane-bituminous-coking">Bituminous (Coking)</label>
-                        <input type="number" id="methane-bituminous-coking" name="methane-bituminous-coking" step="0.01">
-                    </div>
-                    <div class="sub-field-pair">
-                        <label for="methane-bituminous-non-coking">Bituminous (Non-Coking)</label>
-                        <input type="number" id="methane-bituminous-non-coking" name="methane-bituminous-non-coking" step="0.01">
-                    </div>
-                    <div class="sub-field-pair">
-                        <label for="methane-subbituminous">Subbituminous</label>
-                        <input type="number" id="methane-subbituminous" name="methane-subbituminous" step="0.01">
-                    </div>
                     <div class="sub-field-single">
-                        <label for="methane-lignite">Lignite</label>
-                        <input type="number" id="methane-lignite" name="methane-lignite" step="0.01">
+                        <label for="ventilation-energy">Ventilation Energy Consumption (kWh/tonne)</label>
+                        <input type="number" id="ventilation-energy" name="ventilation-energy" step="0.01">
                     </div>
                 </div>
             </div>
@@ -179,29 +265,194 @@
         function toggleMineFields() {
             const openCastFields = document.getElementById('open-cast-fields');
             const undergroundFields = document.getElementById('underground-fields');
+            const carbonStockMethane = document.getElementById('carbon-stock-methane');
             const openCastRadio = document.getElementById('open-cast');
             const undergroundRadio = document.getElementById('underground');
             
             if (openCastRadio.checked) {
                 openCastFields.style.display = 'block';
                 undergroundFields.style.display = 'none';
+                carbonStockMethane.style.display = 'none';
             } else if (undergroundRadio.checked) {
                 openCastFields.style.display = 'none';
                 undergroundFields.style.display = 'block';
+                carbonStockMethane.style.display = 'block';
             } else {
                 openCastFields.style.display = 'none';
                 undergroundFields.style.display = 'none';
+                carbonStockMethane.style.display = 'none';
             }
         }
         
-        function toggleNavMenu() {
-            const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('nav-active');
+        function generateExplosiveFields() {
+            const container = document.getElementById('explosives-container');
+            const count = parseInt(document.getElementById('explosives-count').value);
+            
+            // Clear existing fields
+            container.innerHTML = '';
+            
+            // Generate new fields based on the count
+            for (let i = 1; i <= count; i++) {
+                const fieldGroup = document.createElement('div');
+                fieldGroup.className = 'sub-fields explosive-fields';
+                
+                let removeButton = '';
+                if (count > 1) {
+                    removeButton = `
+                        <div class="add-button-container">
+                            <button type="button" class="remove-btn" onclick="removeExplosiveField(this)" title="Remove this explosive">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                fieldGroup.innerHTML = `
+                    <h5>Explosive #${i}</h5>
+                    <div class="sub-field-pair">
+                        <label for="explosive-type-${i}">Type of Explosive</label>
+                        <input type="text" id="explosive-type-${i}" name="explosive-type-${i}" required>
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="explosive-emission-${i}">Emission Factor (kg CO₂/kg)</label>
+                        <input type="number" id="explosive-emission-${i}" name="explosive-emission-${i}" step="0.01" required>
+                    </div>
+                    ${removeButton}
+                `;
+                container.appendChild(fieldGroup);
+            }
+        }
+        
+        function removeExplosiveField(button) {
+            const fieldGroup = button.closest('.explosive-fields');
+            fieldGroup.remove();
+            
+            // Update count and renumber remaining explosives
+            const container = document.getElementById('explosives-container');
+            const explosiveCount = container.getElementsByClassName('explosive-fields').length;
+            document.getElementById('explosives-count').value = explosiveCount;
+            
+            // Renumber the remaining explosives
+            const explosiveFields = container.getElementsByClassName('explosive-fields');
+            for (let i = 0; i < explosiveFields.length; i++) {
+                const heading = explosiveFields[i].querySelector('h5');
+                heading.textContent = `Explosive #${i + 1}`;
+            }
+        }
+        
+        function addTransportField() {
+            transportCount++;
+            const container = document.getElementById('transportation-container');
+            
+            const fieldGroup = document.createElement('div');
+            fieldGroup.className = 'sub-fields transportation-fields';
+            fieldGroup.innerHTML = `
+                <h4>Transport #${transportCount}</h4>
+                <div class="sub-field-pair">
+                    <label for="transport-type-${transportCount}">Type of Transport</label>
+                    <input type="text" id="transport-type-${transportCount}" name="transport-type-${transportCount}" required>
+                </div>
+                <div class="sub-field-pair">
+                    <label for="transport-emission-${transportCount}">Emission Factor (kg CO₂/km)</label>
+                    <input type="number" id="transport-emission-${transportCount}" name="transport-emission-${transportCount}" step="0.001" required>
+                </div>
+                <div class="add-button-container">
+                    <button type="button" class="remove-transport-btn" onclick="removeTransportField(this)" title="Remove this transport">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(fieldGroup);
+        }
+        
+        function removeTransportField(button) {
+            const fieldGroup = button.closest('.transportation-fields');
+            fieldGroup.remove();
+            
+            // Renumber the remaining transport fields
+            const transportFields = document.getElementsByClassName('transportation-fields');
+            
+            // Update the transportCount
+            transportCount = transportFields.length;
+            
+            // Renumber the remaining fields
+            for (let i = 0; i < transportCount; i++) {
+                const heading = transportFields[i].querySelector('h4'); // Changed from h5 to h4
+                if (heading) {
+                    heading.textContent = `Transport #${i + 1}`;
+                }
+                
+                const typeInput = transportFields[i].querySelector('[id^="transport-type-"]');
+                const emissionInput = transportFields[i].querySelector('[id^="transport-emission-"]');
+                
+                if (typeInput && emissionInput) {
+                    typeInput.id = `transport-type-${i + 1}`;
+                    typeInput.name = `transport-type-${i + 1}`;
+                    emissionInput.id = `transport-emission-${i + 1}`;
+                    emissionInput.name = `transport-emission-${i + 1}`;
+                }
+            }
+        }
+        
+        let transportCount = 0;
+        
+        let explosiveCount = 0;
+        
+        function addExplosiveField() {
+            explosiveCount++;
+            const container = document.getElementById('explosives-container');
+            
+            const fieldGroup = document.createElement('div');
+            fieldGroup.className = 'sub-fields explosive-fields';
+            fieldGroup.innerHTML = `
+                <h5>Explosive #${explosiveCount}</h5>
+                <div class="sub-field-pair">
+                    <label for="explosive-type-${explosiveCount}">Type of Explosive</label>
+                    <input type="text" id="explosive-type-${explosiveCount}" name="explosive-type-${explosiveCount}" required>
+                </div>
+                <div class="sub-field-pair">
+                    <label for="explosive-emission-${explosiveCount}">Emission Factor (kg CO₂/kg)</label>
+                    <input type="number" id="explosive-emission-${explosiveCount}" name="explosive-emission-${explosiveCount}" step="0.01" required>
+                </div>
+                <div class="add-button-container">
+                    <button type="button" class="remove-btn" onclick="removeExplosiveField(this)" title="Remove this explosive">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(fieldGroup);
+        }
+        
+        function removeExplosiveField(button) {
+            const fieldGroup = button.closest('.explosive-fields');
+            fieldGroup.remove();
+            
+            // Renumber the remaining explosives
+            const explosiveFields = document.getElementsByClassName('explosive-fields');
+            for (let i = 0; i < explosiveFields.length; i++) {
+                const heading = explosiveFields[i].querySelector('h5');
+                heading.textContent = `Explosive #${i + 1}`;
+                
+                const typeInput = explosiveFields[i].querySelector('[id^="explosive-type-"]');
+                const emissionInput = explosiveFields[i].querySelector('[id^="explosive-emission-"]');
+                
+                typeInput.id = `explosive-type-${i + 1}`;
+                typeInput.name = `explosive-type-${i + 1}`;
+                emissionInput.id = `explosive-emission-${i + 1}`;
+                emissionInput.name = `explosive-emission-${i + 1}`;
+            }
+            
+            // Update the explosiveCount
+            explosiveCount = explosiveFields.length;
         }
         
         // Run on page load to handle any pre-selected values
         document.addEventListener('DOMContentLoaded', function() {
             toggleMineFields();
+            generateExplosiveFields(); // Generate initial explosive field
+            // Generate at least one explosive field by default
+            addExplosiveField();
+            addTransportField();
         });
     </script>
 </body>
