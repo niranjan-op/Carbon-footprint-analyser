@@ -53,7 +53,7 @@ def Calculator(request):
     
     return render(request, 'Calculator/Calculator.html', context)
 
-@login_required
+
 def Configure_Constants(request):
     # Check if there are saved constants for this user
     user_constants = None
