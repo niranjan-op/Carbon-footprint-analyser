@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Carbon Footprint Calculator</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
 </head>
@@ -16,12 +16,28 @@
             <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
         </ul>
         <ul class="nav-right">
-            <li><a href="{% url 'login' %}">Login</a></li>
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'Model:project_history' %}">View Projects</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
         </ul>
-        
     </nav>
     <div class="container">
-        <form class="carbon-footprint-form">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form class="carbon-footprint-form" method="POST">
+            {% csrf_token %}
             <div class="config-notice">
                 <div class="notice-icon">⚙️</div>
                 <div class="notice-content">
@@ -34,54 +50,138 @@
                 </div>
             </div>
             <h1>Carbon footprint analyser</h1>
-            <h2>1. Mining Activities</h2>
+            
+            <!-- Optional Project Name -->
+            <div class="form-group">
+                <div class="sub-field-single">
+                    <label for="project-name">Project Name <span class="required">*</span></label>
+                    <input type="text" id="project-name" name="project_name" placeholder="Enter a name for this analysis" required>
+                </div>
+            </div>
+            
+            <h2>1. Type of coal mine:</h2>
+            <div class="radio-group">
+                <div class="radio-items">
+                    <input type="radio" id="id_mine_type_0" name="mine_type" value="open-cast" checked onchange="toggleMineFields()" required>
+                    <label for="id_mine_type_0">Open Cast Coal Mine</label>
+                </div>
+                <div class="radio-items">
+                    <input type="radio" id="id_mine_type_1" name="mine_type" value="underground" onchange="toggleMineFields()" required>
+                    <label for="id_mine_type_1">Underground Coal Mine</label>
+                </div>
+            </div>
+        
+            <h2>2. Mining Activities</h2>
             <div class="form-group">
                 <h3>Coal and types of production</h3>
                 <div class="sub-fields">
                     <div class="sub-field-pair">
-                        <label for="anthracite">Anthracite (tonnes)</label>
-                        <input type="number" id="anthracite" name="anthracite">
+                        <label for="anthracite">Anthracite (tonnes) <span class="required">*</span></label>
+                        <input type="number" id="anthracite" name="anthracite" required>
                     </div>
                     <div class="sub-field-pair">
-                        <label for="bituminous-coking">Bituminous (Coking) (tonnes)</label>
-                        <input type="number" id="bituminous-coking" name="bituminous-coking">
+                        <label for="bituminous-coking">Bituminous (Coking) (tonnes) <span class="required">*</span></label>
+                        <input type="number" id="bituminous-coking" name="bituminous-coking" required>
                     </div>
                     <div class="sub-field-pair">
-                        <label for="bituminous-non-coking">Bituminous (Non-Coking) (tonnes)</label>
-                        <input type="number" id="bituminous-non-coking" name="bituminous-non-coking">
+                        <label for="bituminous-non-coking">Bituminous (Non-Coking) (tonnes) <span class="required">*</span></label>
+                        <input type="number" id="bituminous-non-coking" name="bituminous-non-coking" required>
                     </div>
                     <div class="sub-field-pair">
-                        <label for="subbituminous">Subbituminous (tonnes)</label>
-                        <input type="number" id="subbituminous" name="subbituminous">
+                        <label for="subbituminous">Subbituminous (tonnes) <span class="required">*</span></label>
+                        <input type="number" id="subbituminous" name="subbituminous" required>
                     </div>
                     <div class="sub-field-single">
-                        <label for="lignite">Lignite (tonnes)</label>
-                        <input type="number" id="lignite" name="lignite">
+                        <label for="lignite">Lignite (tonnes) <span class="required">*</span></label>
+                        <input type="number" id="lignite" name="lignite" required>
                     </div>
                 </div>
             </div>
-            <h2>2. Equipments and fuel emissions</h2>
+            
+            <!-- Underground specific fields -->
+            <div id="underground-fields" class="form-group" style="display: none;">
+                <h3>Underground Mine Specifics</h3>
+                <!-- Add your underground specific fields here -->
+            </div>
+            
+            <!-- Methane emission fields for underground mines -->
+            <div id="carbon-stock-methane" class="form-group" style="display: none;">
+                <h3>Methane Emissions</h3>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="anthracite-ch4">Anthracite Methane (m³/tonne)</label>
+                        <input type="number" id="anthracite-ch4" name="anthracite_ch4" min="0" step="0.1">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-c-ch4">Bituminous (Coking) Methane (m³/tonne)</label>
+                        <input type="number" id="bituminous-c-ch4" name="bituminous_c_ch4" min="0" step="0.1">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-nc-ch4">Bituminous (Non-Coking) Methane (m³/tonne)</label>
+                        <input type="number" id="bituminous-nc-ch4" name="bituminous_nc_ch4" min="0" step="0.1">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="subbituminous-ch4">Subbituminous Methane (m³/tonne)</label>
+                        <input type="number" id="subbituminous-ch4" name="subbituminous_ch4" min="0" step="0.1">
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="lignite-ch4">Lignite Methane (m³/tonne)</label>
+                        <input type="number" id="lignite-ch4" name="lignite_ch4" min="0" step="0.1">
+                    </div>
+                </div>
+            </div>
+            
+            <h2>3. Equipments and fuel emissions</h2>
             <div class="form-group">
                 <div class="sub-fields">
                     <div class="sub-field-pair">
-                        <label for="diesel-machinery">Diesel Powered Machinery Used (liters)</label>
-                        <input type="number" id="diesel-machinery" name="diesel-machinery">
+                        <label for="diesel-machinery">Total Diesel used (in liters(L)) <span class="required">*</span></label>
+                        <input type="number" id="diesel-machinery" name="diesel_used" required>
                     </div>
                     <div class="sub-field-pair">
-                        <label for="petrol-machinery">Petrol Powered Machinery (liters)</label>
-                        <input type="number" id="petrol-machinery" name="petrol-machinery">
+                        <label for="petrol-machinery">Total Petrol used (in liters(L)) <span class="required">*</span></label>
+                        <input type="number" id="petrol-machinery" name="petrol_used" required>
                     </div>
                     <div class="sub-field-pair">
-                        <label for="explosives-used">Explosives Used (kg)</label>
-                        <input type="number" id="explosives-used" name="explosives-used">
-                    </div>
-                    <div class="sub-field-pair">
-                        <label for="electricity-used">Electricity Used (MWh)</label>
-                        <input type="number" id="electricity-used" name="electricity-used">
+                        <label for="electricity-used">Total Electricity Usage (MWh) <span class="required">*</span></label>
+                        <input type="number" id="electricity-used" name="electricity_used" required>
                     </div>
                 </div>
             </div>
+            
+            <h3>Explosives Usage</h3>
+            <div class="form-group" id="explosives-usage-container">
+                <!-- Explosive usage fields will be dynamically populated -->
+                <div class="sub-fields">
+                    <p id="no-explosives">No explosives have been configured. Please add explosives in the Configure Constants page.</p>
+                </div>
+            </div>
+            
+            <h2>4. Transportation</h2>
+            <div class="form-group">
+                <h3>Transport Types and Distances</h3>
+                <div id="transport-options-container">
+                    <!-- Transport option fields will be dynamically populated -->
+                    <div class="sub-fields">
+                        <p id="no-transports">No transport types have been configured. Please add transport types in the Configure Constants page.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OpenCast specific fields -->
+            <div id="open-cast-fields" class="form-group">
+                <h2>5. Overburden Removal</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="overburden-removed">Overburden Removed (cubic meters) <span class="required">*</span></label>
+                        <input type="number" id="overburden-removed" name="overburden_removed" required>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="button" id="calculate-btn">Calculate Carbon Footprint</button>
         </form>
     </div>
+    <script src="{% static 'js/calculator_js.js' %}"></script>
 </body>
 </html>

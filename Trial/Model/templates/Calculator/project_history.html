@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project History | Carbon Footprint Analyser</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/project_history.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'Model:project_history' %}">View Projects</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="history-header">
+            <h1>Your Carbon Footprint Projects</h1>
+            <p>Review your past carbon footprint calculations and track your progress over time.</p>
+        </div>
+
+        {% if not user.is_authenticated %}
+        <div class="login-prompt">
+            <div class="prompt-icon">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <div class="prompt-content">
+                <h3>Login to View Your Projects</h3>
+                <p>Sign in to access your project history and track your carbon footprint over time.</p>
+                <a href="{% url 'login' %}" class="btn btn-primary">Login Now</a>
+            </div>
+        </div>
+        {% elif not projects %}
+        <div class="no-projects">
+            <div class="empty-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="empty-content">
+                <h3>No Projects Found</h3>
+                <p>You haven't created any carbon footprint projects yet. Create your first project to start tracking your emissions.</p>
+                <a href="{% url 'Model:Calculator' %}" class="btn btn-primary">Calculate Your Footprint</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="filter-controls">
+            <div class="search-box">
+                <input type="text" id="project-search" placeholder="Search by project name...">
+                <button type="button" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="sort-controls">
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="date-desc">Date (Newest First)</option>
+                    <option value="date-asc">Date (Oldest First)</option>
+                    <option value="emissions-high">Emissions (Highest First)</option>
+                    <option value="emissions-low">Emissions (Lowest First)</option>
+                    <option value="name-asc">Project Name (A-Z)</option>
+                    <option value="name-desc">Project Name (Z-A)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="projects-list">
+            {% for project in projects %}
+            <div class="project-card">
+                <div class="project-header">
+                    <h3>{{ project.project_name }}</h3>
+                    <span class="date">{{ project.calculation_date|date:"F j, Y" }}</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-column">
+                        <div class="detail-item">
+                            <span class="detail-label">Mine Type:</span>
+                            <span class="detail-value">{{ project.get_mine_type_display }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Coal Production:</span>
+                            <span class="detail-value">{{ project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite|floatformat:2 }} tonnes</span>
+                        </div>
+                    </div>
+                    <div class="detail-column">
+                        <div class="detail-item">
+                            <span class="detail-label">Transport Distance:</span>
+                            <span class="detail-value">{{ project.transport_distance|floatformat:2 }} km</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Explosives Used:</span>
+                            <span class="detail-value">{{ project.explosives_used|floatformat:2 }} kg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="emissions-summary">
+                    <div class="emissions-total">
+                        <span class="emissions-value">{{ project.total_emissions|floatformat:2 }}</span>
+                        <span class="emissions-unit">tonnes CO₂e</span>
+                    </div>
+                    <div class="emissions-per-tonne">
+                        <span class="per-tonne-label">Per tonne of coal:</span>
+                        <span class="per-tonne-value">{{ project.emissions_per_tonne|floatformat:4 }} tonnes CO₂e</span>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <a href="{% url 'Model:project_detail' project.id %}" class="btn-details">
+                        <i class="fas fa-chart-bar"></i> View Details
+                    </a>
+                    <a href="{% url 'Model:Calculator' %}?project_id={{ project.id }}" class="btn-recalculate">
+                        <i class="fas fa-sync-alt"></i> Recalculate
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="pagination-item first">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-item prev">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            {% endif %}
+            
+            <span class="pagination-current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-item next">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-item last">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.getElementById('project-search');
+            const searchBtn = document.getElementById('search-btn');
+            const projectCards = document.querySelectorAll('.project-card');
+            
+            function filterProjects() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                projectCards.forEach(card => {
+                    const projectName = card.querySelector('.project-header h3').textContent.toLowerCase();
+                    if (projectName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            searchBtn.addEventListener('click', filterProjects);
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    filterProjects();
+                }
+            });
+            
+            // Sorting functionality
+            const sortSelect = document.getElementById('sort-by');
+            const projectsList = document.querySelector('.projects-list');
+            
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                const projectsArray = Array.from(projectCards);
+                
+                projectsArray.sort((a, b) => {
+                    if (sortValue === 'date-desc') {
+                        const dateA = new Date(a.querySelector('.date').textContent);
+                        const dateB = new Date(b.querySelector('.date').textContent);
+                        return dateB - dateA;
+                    } else if (sortValue === 'date-asc') {
+                        const dateA = new Date(a.querySelector('.date').textContent);
+                        const dateB = new Date(b.querySelector('.date').textContent);
+                        return dateA - dateB;
+                    } else if (sortValue === 'emissions-high') {
+                        const emissionsA = parseFloat(a.querySelector('.emissions-value').textContent);
+                        const emissionsB = parseFloat(b.querySelector('.emissions-value').textContent);
+                        return emissionsB - emissionsA;
+                    } else if (sortValue === 'emissions-low') {
+                        const emissionsA = parseFloat(a.querySelector('.emissions-value').textContent);
+                        const emissionsB = parseFloat(b.querySelector('.emissions-value').textContent);
+                        return emissionsA - emissionsB;
+                    } else if (sortValue === 'name-asc') {
+                        const nameA = a.querySelector('.project-header h3').textContent;
+                        const nameB = b.querySelector('.project-header h3').textContent;
+                        return nameA.localeCompare(nameB);
+                    } else if (sortValue === 'name-desc') {
+                        const nameA = a.querySelector('.project-header h3').textContent;
+                        const nameB = b.querySelector('.project-header h3').textContent;
+                        return nameB.localeCompare(nameA);
+                    }
+                    return 0;
+                });
+                
+                // Clear the list and append sorted cards
+                projectsList.innerHTML = '';
+                projectsArray.forEach(card => {
+                    projectsList.appendChild(card);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

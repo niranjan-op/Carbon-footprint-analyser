@@ -1,0 +1,294 @@
+/* Results Page Styles */
+.results-banner {
+    background-color: #1c7e50;
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.results-banner h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.results-banner p {
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.results-overview {
+    padding: 20px 0 40px;
+}
+
+.results-card, .details-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+.total-score {
+    margin: 30px 0;
+}
+
+.total-score #total-footprint {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #1c7e50;
+}
+
+.total-score .unit {
+    font-size: 1.1rem;
+    display: block;
+    color: #666;
+    margin-top: 5px;
+}
+
+.comparison {
+    margin: 30px 0;
+}
+
+.comparison p {
+    margin-bottom: 15px;
+}
+
+.comparison-bar {
+    background-color: #e9e9e9;
+    height: 20px;
+    border-radius: 10px;
+    position: relative;
+    margin: 20px 0;
+}
+
+.your-score {
+    width: 15px;
+    height: 30px;
+    background-color: #1c7e50;
+    position: absolute;
+    top: -5px;
+    transform: translateX(-50%);
+    border-radius: 3px;
+}
+
+.comparison-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.results-breakdown, .project-details {
+    padding: 20px 0 40px;
+}
+
+.results-breakdown h3, .project-details h3, .recommendations h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.breakdown-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.breakdown-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    text-align: center;
+    width: 220px;
+    transition: transform 0.3s ease;
+}
+
+.breakdown-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #e8f5ee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.card-icon i {
+    font-size: 1.8rem;
+    color: #1c7e50;
+}
+
+.breakdown-card h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.breakdown-card .score {
+    font-weight: bold;
+    color: #1c7e50;
+    margin-bottom: 5px;
+}
+
+.detail-item {
+    text-align: left;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #444;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: #666;
+}
+
+.recommendations {
+    padding: 20px 0 50px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.recommendations-list {
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.recommendation-item:hover {
+    transform: translateY(-3px);
+}
+
+.rec-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #e8f5ee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.rec-icon i {
+    font-size: 1.5rem;
+    color: #1c7e50;
+}
+
+.rec-content h4 {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.rec-content p {
+    color: #666;
+    line-height: 1.4;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #1c7e50;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    padding: 20px;
+    background-color: #fff6f6;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin: 20px 0;
+    color: #721c24;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .breakdown-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .breakdown-card {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .recommendation-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .rec-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 250px;
+        text-align: center;
+    }
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Results | Carbon Footprint Analyser</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/results.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'Model:project_history' %}">View Projects</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section class="results-banner">
+            <div class="container">
+                <h2>Your Carbon Footprint Results</h2>
+                <p>Review your environmental impact and find ways to reduce it.</p>
+            </div>
+        </section>
+
+        <section class="results-overview">
+            <div class="container">
+                <div class="results-card">
+                    <h3>Your Total Carbon Footprint</h3>
+                    {% if emission %}
+                    <div class="total-score">
+                        <span id="total-footprint">{{ emission.total_emissions|floatformat:2 }}</span>
+                        <span class="unit">tonnes CO₂e/year</span>
+                    </div>
+                    
+                    <div class="comparison">
+                        <p>The average carbon footprint is <span id="average-footprint">5.0</span> tonnes CO₂e/year per person.</p>
+                        <div class="comparison-bar">
+                            <div class="your-score" id="comparison-indicator"></div>
+                        </div>
+                        <div class="comparison-labels">
+                            <span>Low Impact</span>
+                            <span>Average</span>
+                            <span>High Impact</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="error-message">
+                        <p>Sorry, we couldn't find the emission results. Please try calculating again.</p>
+                        <a href="{% url 'Model:Calculator' %}" class="btn btn-primary">Calculate Now</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        {% if emission %}
+        <section class="results-breakdown">
+            <div class="container">
+                <h3>Carbon Footprint Breakdown</h3>
+                <div class="breakdown-cards">
+                    <div class="breakdown-card">
+                        <div class="card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4>Electricity Usage</h4>
+                        <div class="score" id="electricity-score">{{ emission.electricity_used|floatformat:2 }} MWh</div>
+                    </div>
+
+                    <div class="breakdown-card">
+                        <div class="card-icon">
+                            <i class="fas fa-gas-pump"></i>
+                        </div>
+                        <h4>Diesel & Petrol</h4>
+                        <div class="score" id="fuel-score">{{ emission.diesel_used|floatformat:2 }} L diesel, {{ emission.petrol_used|floatformat:2 }} L petrol</div>
+                    </div>
+
+                    <div class="breakdown-card">
+                        <div class="card-icon">
+                            <i class="fas fa-bomb"></i>
+                        </div>
+                        <h4>Explosives</h4>
+                        <div class="score" id="explosives-score">{{ emission.explosives_used|floatformat:2 }} kg</div>
+                    </div>
+
+                    <div class="breakdown-card">
+                        <div class="card-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h4>Transportation</h4>
+                        <div class="score" id="transport-score">{{ emission.transport_distance|floatformat:2 }} km</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-details">
+            <div class="container">
+                <h3>Project Details</h3>
+                <div class="details-card">
+                    <h4>{{ emission.project_name|default:"Unnamed Project" }}</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Mine Type:</span>
+                        <span class="detail-value">{{ emission.get_mine_type_display }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Coal Production:</span>
+                        <span class="detail-value">
+                            {% if emission.anthracite > 0 %}Anthracite: {{ emission.anthracite|floatformat:2 }} tonnes<br>{% endif %}
+                            {% if emission.bituminous_coking > 0 %}Bituminous (Coking): {{ emission.bituminous_coking|floatformat:2 }} tonnes<br>{% endif %}
+                            {% if emission.bituminous_non_coking > 0 %}Bituminous (Non-Coking): {{ emission.bituminous_non_coking|floatformat:2 }} tonnes<br>{% endif %}
+                            {% if emission.subbituminous > 0 %}Subbituminous: {{ emission.subbituminous|floatformat:2 }} tonnes<br>{% endif %}
+                            {% if emission.lignite > 0 %}Lignite: {{ emission.lignite|floatformat:2 }} tonnes{% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Emissions Per Tonne:</span>
+                        <span class="detail-value">{{ emission.emissions_per_tonne|floatformat:4 }} tonnes CO₂e/tonne</span>
+                    </div>
+                    {% if emission.mine_type == 'open-cast' and emission.overburden_removed > 0 %}
+                    <div class="detail-item">
+                        <span class="detail-label">Overburden Removed:</span>
+                        <span class="detail-value">{{ emission.overburden_removed|floatformat:2 }} m³</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="recommendations">
+            <div class="container">
+                <h3>Recommendations to Reduce Your Impact</h3>
+                <div class="recommendations-list" id="recommendations-container">
+                    <!-- Recommendations will be dynamically added here -->
+                    <div class="recommendation-item">
+                        <div class="rec-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="rec-content">
+                            <h4>Energy Optimization</h4>
+                            <p>Implement energy efficiency measures to reduce electricity consumption. Consider installing energy monitoring systems and scheduling routine equipment maintenance.</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="rec-icon">
+                            <i class="fas fa-gas-pump"></i>
+                        </div>
+                        <div class="rec-content">
+                            <h4>Fuel Management</h4>
+                            <p>Optimize vehicle routes and implement a fuel management system. Consider fuel-efficient or electric vehicles where possible.</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="rec-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="rec-content">
+                            <h4>Carbon Offsetting</h4>
+                            <p>Invest in carbon offset projects like reforestation or renewable energy to compensate for emissions that cannot be reduced.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <a href="{% url 'Model:Calculator' %}" class="btn btn-secondary">Recalculate</a>
+                    <a href="{% url 'Model:Configure_Constants' %}" class="btn btn-primary">Adjust Constants</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set comparison indicator position
+            {% if emission %}
+            const comparisonIndicator = document.getElementById('comparison-indicator');
+            // Position indicator based on total footprint (assuming 10 tonnes is max)
+            const position = Math.min({{ emission.total_emissions }} / 10 * 100, 100);
+            comparisonIndicator.style.left = `${position}%`;
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

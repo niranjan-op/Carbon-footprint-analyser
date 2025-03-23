@@ -6,18 +6,19 @@ function toggleMineFields() {
     const openCastRadio = document.getElementById('id_mine_type_0');
     const undergroundRadio = document.getElementById('id_mine_type_1');
     
+    // Only try to change the style if the element exists
     if (openCastRadio && openCastRadio.checked) {
-        openCastFields.style.display = 'block';
+        if (openCastFields) openCastFields.style.display = 'block';
         if (undergroundFields) undergroundFields.style.display = 'none';
-        carbonStockMethane.style.display = 'none';
+        if (carbonStockMethane) carbonStockMethane.style.display = 'none';
     } else if (undergroundRadio && undergroundRadio.checked) {
-        openCastFields.style.display = 'none';
+        if (openCastFields) openCastFields.style.display = 'none';
         if (undergroundFields) undergroundFields.style.display = 'block';
-        carbonStockMethane.style.display = 'block';
+        if (carbonStockMethane) carbonStockMethane.style.display = 'block';
     } else {
-        openCastFields.style.display = 'none';
+        if (openCastFields) openCastFields.style.display = 'none';
         if (undergroundFields) undergroundFields.style.display = 'none';
-        carbonStockMethane.style.display = 'none';
+        if (carbonStockMethane) carbonStockMethane.style.display = 'none';
     }
 }
 

@@ -93,6 +93,7 @@ class CalculatorForm(forms.ModelForm):
             'transport_distance',
         ]
         widgets = {
+            'mine_type': forms.RadioSelect(attrs={'onchange': 'toggleMineFields()'}),
             'project_name': forms.TextInput(attrs={'placeholder': 'Enter project name'}),
             'anthracite': forms.NumberInput(attrs={'id': 'anthracite', 'placeholder': 'Enter tonnes'}),
             'bituminous_coking': forms.NumberInput(attrs={'id': 'bituminous-coking', 'placeholder': 'Enter tonnes'}),

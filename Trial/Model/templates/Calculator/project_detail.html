@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.project_name }} | Carbon Footprint Analyser</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/results.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/project_history.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="project-detail-header">
+            <div class="back-link">
+                <a href="{% url 'Model:project_history' %}">
+                    <i class="fas fa-arrow-left"></i> Back to Projects
+                </a>
+            </div>
+            <h1>{{ project.project_name }}</h1>
+            <p>Calculated on {{ project.calculation_date|date:"F j, Y" }} at {{ project.calculation_date|time:"g:i A" }}</p>
+        </div>
+
+        <section class="results-overview">
+            <div class="container">
+                <div class="results-card">
+                    <h3>Total Carbon Footprint</h3>
+                    <div class="total-score">
+                        <span id="total-footprint">{{ project.total_emissions|floatformat:2 }}</span>
+                        <span class="unit">tonnes CO₂e</span>
+                    </div>
+                    
+                    <div class="comparison">
+                        <p>The average carbon footprint is <span id="average-footprint">5.0</span> tonnes CO₂e/year per person.</p>
+                        <div class="comparison-bar">
+                            <div class="your-score" id="comparison-indicator"></div>
+                        </div>
+                        <div class="comparison-labels">
+                            <span>Low Impact</span>
+                            <span>Average</span>
+                            <span>High Impact</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="detail-sections">
+            <section class="mine-info">
+                <h2>Mine Information</h2>
+                <div class="detail-card">
+                    <div class="detail-row">
+                        <span class="label">Mine Type:</span>
+                        <span class="value">{{ project.get_mine_type_display }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Coal Production:</span>
+                        <span class="value">{{ project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite|floatformat:2 }} tonnes</span>
+                    </div>
+                    {% if project.mine_type == 'open-cast' and project.overburden_removed > 0 %}
+                    <div class="detail-row">
+                        <span class="label">Overburden Removed:</span>
+                        <span class="value">{{ project.overburden_removed|floatformat:2 }} m³</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <h3>Coal Types Breakdown</h3>
+                <div class="coal-chart">
+                    <div class="coal-types">
+                        {% if project.anthracite > 0 %}
+                        <div class="coal-type">
+                            <span class="coal-name">Anthracite</span>
+                            <div class="coal-bar">
+                                <div class="coal-fill anthracite" style="width: {% widthratio project.anthracite project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite 100 %}%"></div>
+                            </div>
+                            <span class="coal-amount">{{ project.anthracite|floatformat:2 }} tonnes</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.bituminous_coking > 0 %}
+                        <div class="coal-type">
+                            <span class="coal-name">Bituminous (Coking)</span>
+                            <div class="coal-bar">
+                                <div class="coal-fill bituminous-c" style="width: {% widthratio project.bituminous_coking project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite 100 %}%"></div>
+                            </div>
+                            <span class="coal-amount">{{ project.bituminous_coking|floatformat:2 }} tonnes</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.bituminous_non_coking > 0 %}
+                        <div class="coal-type">
+                            <span class="coal-name">Bituminous (Non-Coking)</span>
+                            <div class="coal-bar">
+                                <div class="coal-fill bituminous-nc" style="width: {% widthratio project.bituminous_non_coking project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite 100 %}%"></div>
+                            </div>
+                            <span class="coal-amount">{{ project.bituminous_non_coking|floatformat:2 }} tonnes</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.subbituminous > 0 %}
+                        <div class="coal-type">
+                            <span class="coal-name">Subbituminous</span>
+                            <div class="coal-bar">
+                                <div class="coal-fill subbituminous" style="width: {% widthratio project.subbituminous project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite 100 %}%"></div>
+                            </div>
+                            <span class="coal-amount">{{ project.subbituminous|floatformat:2 }} tonnes</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.lignite > 0 %}
+                        <div class="coal-type">
+                            <span class="coal-name">Lignite</span>
+                            <div class="coal-bar">
+                                <div class="coal-fill lignite" style="width: {% widthratio project.lignite project.anthracite|add:project.bituminous_coking|add:project.bituminous_non_coking|add:project.subbituminous|add:project.lignite 100 %}%"></div>
+                            </div>
+                            <span class="coal-amount">{{ project.lignite|floatformat:2 }} tonnes</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+            
+            <section class="resources-info">
+                <h2>Resources Usage</h2>
+                <div class="detail-card">
+                    <div class="detail-row">
+                        <span class="label">Diesel Used:</span>
+                        <span class="value">{{ project.diesel_used|floatformat:2 }} liters</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Petrol Used:</span>
+                        <span class="value">{{ project.petrol_used|floatformat:2 }} liters</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Electricity Used:</span>
+                        <span class="value">{{ project.electricity_used|floatformat:2 }} MWh</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Explosives Used:</span>
+                        <span class="value">{{ project.explosives_used|floatformat:2 }} kg</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Transport Distance:</span>
+                        <span class="value">{{ project.transport_distance|floatformat:2 }} km</span>
+                    </div>
+                </div>
+            </section>
+            
+            {% if project.explosive_usages.all %}
+            <section class="explosives-breakdown">
+                <h2>Explosives Breakdown</h2>
+                <div class="detail-card">
+                    <table class="explosives-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Amount (kg)</th>
+                                <th>Emission Factor</th>
+                                <th>Emissions (kg CO₂e)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usage in project.explosive_usages.all %}
+                            <tr>
+                                <td>{{ usage.explosive.explosive_type }}</td>
+                                <td>{{ usage.amount|floatformat:2 }}</td>
+                                <td>{{ usage.explosive.emission_factor|floatformat:3 }} kg CO₂e/kg</td>
+                                <td>{{ usage.emissions|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
+            
+            {% if project.transport_usages.all %}
+            <section class="transport-breakdown">
+                <h2>Transport Breakdown</h2>
+                <div class="detail-card">
+                    <table class="transport-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Distance (km)</th>
+                                <th>Emission Factor</th>
+                                <th>Emissions (kg CO₂e)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usage in project.transport_usages.all %}
+                            <tr>
+                                <td>{{ usage.transport.transport_type }}</td>
+                                <td>{{ usage.distance|floatformat:2 }}</td>
+                                <td>{{ usage.transport.emission_factor|floatformat:3 }} kg CO₂e/km</td>
+                                <td>{{ usage.emissions|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
+            
+            <section class="emissions-final">
+                <h2>Emissions Summary</h2>
+                <div class="detail-card emissions-card">
+                    <div class="emissions-figure">
+                        <span class="emissions-total">{{ project.total_emissions|floatformat:2 }}</span>
+                        <span class="emissions-label">tonnes CO₂e total</span>
+                    </div>
+                    <div class="emissions-figure">
+                        <span class="emissions-per-tonne">{{ project.emissions_per_tonne|floatformat:4 }}</span>
+                        <span class="emissions-label">tonnes CO₂e per tonne of coal</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="actions-row">
+            <a href="{% url 'Model:project_history' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Projects
+            </a>
+            <a href="{% url 'Model:Calculator' %}?project_id={{ project.id }}" class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> Recalculate
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set comparison indicator position
+            const comparisonIndicator = document.getElementById('comparison-indicator');
+            // Position indicator based on total footprint (assuming 10 tonnes is max)
+            const position = Math.min({{ project.total_emissions }} / 10 * 100, 100);
+            comparisonIndicator.style.left = `${position}%`;
+        });
+    </script>
+</body>
+</html>

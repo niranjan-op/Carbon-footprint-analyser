@@ -1,0 +1,326 @@
+/* Project History Page Styles */
+.history-header {
+    background-color: #1c7e50;
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.history-header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.history-header p {
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.login-prompt, .no-projects {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 20px auto;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.prompt-icon, .empty-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #f0f8f4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.prompt-icon i, .empty-icon i {
+    font-size: 2.5rem;
+    color: #1c7e50;
+}
+
+.prompt-content, .empty-content {
+    flex: 1;
+}
+
+.prompt-content h3, .empty-content h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.prompt-content p, .empty-content p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    font-size: 1rem;
+}
+
+.search-box button {
+    padding: 10px 15px;
+    background-color: #1c7e50;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-controls label {
+    color: #666;
+    white-space: nowrap;
+}
+
+.sort-controls select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    font-size: 0.9rem;
+}
+
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.project-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.project-header h3 {
+    color: #1c7e50;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.project-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.detail-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.detail-item {
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    display: block;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.emissions-summary {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.emissions-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.emissions-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #1c7e50;
+}
+
+.emissions-unit {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.emissions-per-tonne {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.per-tonne-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.per-tonne-value {
+    font-weight: bold;
+    color: #333;
+}
+
+.project-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.btn-details,
+.btn-recalculate {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background-color: #f1f1f1;
+    color: #333;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.btn-details:hover,
+.btn-recalculate:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-details i,
+.btn-recalculate i {
+    font-size: 0.9rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.pagination-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: #333;
+    border-radius: 5px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.pagination-item:hover {
+    background-color: #1c7e50;
+    color: white;
+}
+
+.pagination-current {
+    padding: 0 15px;
+    color: #666;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .login-prompt, .no-projects {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .project-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .emissions-summary {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .emissions-total, .emissions-per-tonne {
+        align-items: center;
+    }
+    
+    .project-actions {
+        justify-content: center;
+    }
+}
