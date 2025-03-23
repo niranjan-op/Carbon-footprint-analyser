@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import Configure_Constants_Input, ExplosiveForm, TransportForm, CalculatorForm
 from .models import Constants, Explosive, Transport, CarbonEmission
-
 def Calculator(request):
     # Get the most recent constants set, or create default if none exists
     constants = None
@@ -82,38 +81,74 @@ def Configure_Constants(request):
             # Process explosives
             explosives_count = int(request.POST.get('explosives_count', 0))
             
-            # Clear existing explosives for this constants set
-            constants.explosives.all().delete()
+            # Get existing explosives to update/reuse them
+            existing_explosives = list(constants.explosives.all())
+            existing_count = len(existing_explosives)
             
-            # Add new explosives
+            # Add or update explosives
+            processed_explosive_ids = []
             for i in range(1, explosives_count + 1):
                 explosive_type = request.POST.get(f'explosive-type-{i}')
                 emission_factor = request.POST.get(f'explosive-emission-{i}')
                 
                 if explosive_type and emission_factor:
-                    Explosive.objects.create(
-                        constants=constants,
-                        explosive_type=explosive_type,
-                        emission_factor=float(emission_factor)
-                    )
+                    try:
+                        # If we have an existing record at this index, update it
+                        if i <= existing_count:
+                            explosive = existing_explosives[i-1]
+                            explosive.explosive_type = explosive_type
+                            explosive.emission_factor = float(emission_factor)
+                            explosive.save()
+                            processed_explosive_ids.append(explosive.id)
+                        else:
+                            # Otherwise create a new record
+                            explosive = Explosive.objects.create(
+                                constants=constants,
+                                explosive_type=explosive_type,
+                                emission_factor=float(emission_factor)
+                            )
+                            processed_explosive_ids.append(explosive.id)
+                    except ValueError:
+                        messages.error(request, f"Invalid emission factor value: {emission_factor}")
             
-            # Process transport
+            # Remove explosives that are no longer in the form
+            constants.explosives.exclude(id__in=processed_explosive_ids).delete()
+            
+            # Process transport - Same pattern as explosives
             transport_count = int(request.POST.get('transport_count', 0))
             
-            # Clear existing transports for this constants set
-            constants.transports.all().delete()
+            # Get existing transports to update/reuse them
+            existing_transports = list(constants.transports.all())
+            existing_transport_count = len(existing_transports)
             
-            # Add new transports
+            # Add or update transports
+            processed_transport_ids = []
             for i in range(1, transport_count + 1):
                 transport_type = request.POST.get(f'transport-type-{i}')
                 emission_factor = request.POST.get(f'transport-emission-{i}')
                 
                 if transport_type and emission_factor:
-                    Transport.objects.create(
-                        constants=constants,
-                        transport_type=transport_type,
-                        emission_factor=float(emission_factor)
-                    )
+                    try:
+                        # If we have an existing record at this index, update it
+                        if i <= existing_transport_count:
+                            transport = existing_transports[i-1]
+                            transport.transport_type = transport_type
+                            transport.emission_factor = float(emission_factor)
+                            transport.save()
+                            processed_transport_ids.append(transport.id)
+                        else:
+                            # Otherwise create a new record
+                            transport = Transport.objects.create(
+                                constants=constants,
+                                transport_type=transport_type,
+                                emission_factor=float(emission_factor)
+                            )
+                            processed_transport_ids.append(transport.id)
+                    except ValueError:
+                        messages.error(request, f"Invalid transport emission factor value: {emission_factor}")
+            
+            # Remove transports that are no longer in the form
+            constants.transports.exclude(id__in=processed_transport_ids).delete()
             
             messages.success(request, "Constants saved successfully!")
             return redirect('Model:Calculator')

@@ -22,6 +22,14 @@
                 <li><a href="#">Contact Us</a></li>
                 <li><a href="{% url 'Model:Calculator' %}">Calculator</a></li>
             </ul>
+            <ul class="nav-right">
+                {% if user.is_authenticated %}
+                    <li><span class="username">Welcome, {{ user.username }}</span></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
         </div>
     </nav>
     

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
 
 def login(request):
     if request.method == 'POST':
@@ -14,3 +15,8 @@ def login(request):
             error_message = 'Invalid Username or Password'
             return render(request, 'login/login.html', {'error': error_message})
     return render(request, "login/login.html")
+
+@login_required
+def logout(request):
+    auth_logout(request)
+    return render(request, 'logout/logout.html')

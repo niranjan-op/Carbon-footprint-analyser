@@ -58,6 +58,10 @@ class Constants(models.Model):
     # Open cast mine specific
     overburden_ef = models.FloatField(default=0.5)
     
+    class Meta:
+        verbose_name = "Constants"
+        verbose_name_plural = "Constants"
+    
     def __str__(self):
         if self.user:
             return f"{self.name} - {self.user.username}"
@@ -122,5 +126,11 @@ class CarbonEmission(models.Model):
     methane_emissions = models.FloatField(default=0)
     overburden_emissions = models.FloatField(default=0)
     
+    class Meta:
+        verbose_name = "Carbon Emission"
+        verbose_name_plural = "Carbon Emissions"
+    
     def __str__(self):
-        return f"{self.project_name} - {self.calculation_date.strftime('%Y-%m-%d')}"
+        if self.user:
+            return f"{self.project_name} - {self.user.username} ({self.calculation_date.strftime('%Y-%m-%d')})"
+        return f"Hello{self.project_name} - {self.calculation_date.strftime('%Y-%m-%d')}"

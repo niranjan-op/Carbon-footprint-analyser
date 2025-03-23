@@ -56,3 +56,9 @@ nav ul li a:hover {
 .content p {
     color: #666;
 }
+
+.username {
+    color: #4CAF50;
+    font-weight: bold;
+    padding: 8px 10px;
+}
