@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import Configure_Constants_Input, ExplosiveForm, TransportForm, CalculatorForm
 from .models import Constants, Explosive, Transport, CarbonEmission
+from .Calculation import Carbon_Production
+import numpy as np
+
 def Calculator(request):
     # Get the most recent constants set, or create default if none exists
     constants = None
@@ -27,6 +30,11 @@ def Calculator(request):
     
     form = CalculatorForm()
     
+    # Get explosives and transports from constants for form processing
+    explosives = constants.explosives.all()
+    transports = constants.transports.all()
+    
+    # Add explosives and transport fields dynamically
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
         if form.is_valid():
@@ -37,8 +45,51 @@ def Calculator(request):
                 
             emission.constants = constants
             
-            # TODO: Perform emission calculations here
-            # ...
+            # Process custom explosive values
+            total_explosive_emissions = 0
+            for explosive in explosives:
+                amount_field_name = f'explosive_{explosive.id}_amount'
+                if amount_field_name in request.POST and request.POST[amount_field_name]:
+                    amount = float(request.POST[amount_field_name])
+                    # Calculate emissions: amount * emission_factor
+                    total_explosive_emissions += amount * explosive.emission_factor
+            
+            # Process custom transport values
+            total_transport_emissions = 0
+            for transport in transports:
+                distance_field_name = f'transport_{transport.id}_distance'
+                if distance_field_name in request.POST and request.POST[distance_field_name]:
+                    distance = float(request.POST[distance_field_name])
+                    # Calculate emissions: distance * emission_factor
+                    total_transport_emissions += distance * transport.emission_factor
+            
+            # Save the calculated emissions
+            emission.explosive_emissions = total_explosive_emissions
+            emission.transport_emissions = total_transport_emissions
+
+            # Get mine type from the form data
+            mine_type = request.POST.get('mine_type', 'open_cast')
+            
+            carbon_prod=[emission.anthracite,emission.bituminous_coking,emission.bituminous_non_coking,emission.subbituminous,emission.lignite]
+            coal_type_conv=[emission.anthractie_cf,emission.bituminous_c_cf,emission.bituminous_nc_cf,emission.subbituminous_cf,emission.lignite_cf]
+            carbon_content=[emission.anthracite_cc,emission.bituminuous_c_cc,emission.bituminuous_nc_cc,emission.subbituminous_cc,emission.lignite_cc]
+            cof=[emission.anthracite_cof,emission.bituminuous_c_cof,emission.bituminuous_nc_cof,emission.subbituminous_cof,emission.lignite_cof]
+            Carbon_footprint=Carbon_Production(constants.exclusion_fact ,carbon_prod,carbon_content,coal_type_conv,cof)
+            if mine_type =='open_cast':
+                Carbon_footprint+=np.mul(emission.overburden,emission.overburden_ef)
+                Carbon_footprint+=np.mul(emission.land_disturbance,csl)
+            elif mine_type=='underground':
+                Carbon_footprint+=np.mul(emission.total_ch4,0.00067,25)
+            # Equipment and Fuel Emissions:
+            Carbon_footprint+=np.mul(emission.diesel_used,constants.diesel_ef)
+            Carbon_footprint+=np.mul(emission.petrol_used,constants.petrol_ef)
+            # Electricity Emissions:
+            Carbon_footprint+=np.mul(emission.electricity_used,constants.grid_emission_factor)
+            # Sequestration:
+            Carbon_footprint-=np.mul(emission.sequestration,constants.carbon_sequestration_rate)
+            # Waste:
+            Carbon_footprint+=np.mul(emission.waste,constants.waste_ef)
+            Carbon_footprint+=total_explosive_emissions+total_transport_emissions
             
             emission.save()
             return render(request, 'Calculator/Results.html', {'emission': emission})
@@ -46,11 +97,11 @@ def Calculator(request):
     context = {
         'form': form,
         'constants': constants,
-        'explosives': constants.explosives.all(),
-        'transports': constants.transports.all(),
+        'explosives': explosives,
+        'transports': transports,
     }
     
-    return render(request, 'Calculator/Calculator.html', context)
+    return render(request, 'Calculator/Results.html', context)
 
 
 def Configure_Constants(request):

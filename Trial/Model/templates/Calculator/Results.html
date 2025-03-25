@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Results</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Results_styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="results-card">
+            <div class="results-header">
+                <h1>Carbon Footprint Results</h1>
+                <p class="project-info">Project: {{ emission.project_name|default:"Unnamed Project" }}</p>
+                <p class="date-info">Calculation Date: {{ emission.calculation_date|date:"F j, Y" }}</p>
+            </div>
+
+            <div class="results-summary">
+                <div class="total-emissions">
+                    <h2>Total Emissions</h2>
+                    <div class="emissions-value">
+                        <span class="value">{{ emission.total_emissions|floatformat:2 }}</span>
+                        <span class="unit">tonnes CO₂e</span>
+                    </div>
+                </div>
+                
+                <div class="emissions-per-tonne">
+                    <h3>Emissions per Tonne of Coal</h3>
+                    <div class="emissions-value">
+                        <span class="value">{{ emission.emissions_per_tonne|floatformat:2 }}</span>
+                        <span class="unit">tonnes CO₂e/tonne</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="emissions-breakdown">
+                <h2>Emissions Breakdown</h2>
+                <div class="breakdown-chart-container">
+                    <canvas id="emissionsChart"></canvas>
+                </div>
+                
+                <div class="breakdown-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Emission Source</th>
+                                <th>Amount (tonnes CO₂e)</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if emission.coal_emissions > 0 %}
+                            <tr>
+                                <td>Coal Production</td>
+                                <td>{{ emission.coal_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.coal_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.diesel_emissions > 0 %}
+                            <tr>
+                                <td>Diesel Equipment</td>
+                                <td>{{ emission.diesel_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.diesel_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.petrol_emissions > 0 %}
+                            <tr>
+                                <td>Petrol Equipment</td>
+                                <td>{{ emission.petrol_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.petrol_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.explosive_emissions > 0 %}
+                            <tr>
+                                <td>Explosives</td>
+                                <td>{{ emission.explosive_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.explosive_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.electricity_emissions > 0 %}
+                            <tr>
+                                <td>Electricity</td>
+                                <td>{{ emission.electricity_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.electricity_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.transport_emissions > 0 %}
+                            <tr>
+                                <td>Transportation</td>
+                                <td>{{ emission.transport_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.transport_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.methane_emissions > 0 %}
+                            <tr>
+                                <td>Methane Emissions</td>
+                                <td>{{ emission.methane_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.methane_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.overburden_emissions > 0 %}
+                            <tr>
+                                <td>Overburden Removal</td>
+                                <td>{{ emission.overburden_emissions|floatformat:2 }}</td>
+                                <td>{{ emission.overburden_emissions|div:emission.total_emissions|mul:100|floatformat:1 }}%</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th>{{ emission.total_emissions|floatformat:2 }}</th>
+                                <th>100%</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="coal-production-summary">
+                <h2>Coal Production Summary</h2>
+                <div class="coal-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Coal Type</th>
+                                <th>Amount (tonnes)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if emission.anthracite > 0 %}
+                            <tr>
+                                <td>Anthracite</td>
+                                <td>{{ emission.anthracite|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.bituminous_coking > 0 %}
+                            <tr>
+                                <td>Bituminous (Coking)</td>
+                                <td>{{ emission.bituminous_coking|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.bituminous_non_coking > 0 %}
+                            <tr>
+                                <td>Bituminous (Non-Coking)</td>
+                                <td>{{ emission.bituminous_non_coking|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.subbituminous > 0 %}
+                            <tr>
+                                <td>Subbituminous</td>
+                                <td>{{ emission.subbituminous|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if emission.lignite > 0 %}
+                            <tr>
+                                <td>Lignite</td>
+                                <td>{{ emission.lignite|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th>{{ emission.anthracite|add:emission.bituminous_coking|add:emission.bituminous_non_coking|add:emission.subbituminous|add:emission.lignite|floatformat:2 }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{% url 'Model:Calculator' %}" class="button">Calculate Again</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'Model:view_emission_history' %}" class="button secondary">View History</a>
+                {% endif %}
+                <button onclick="window.print()" class="button print-button">Print Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prepare data for the chart
+            const ctx = document.getElementById('emissionsChart').getContext('2d');
+            
+            // Get emission values
+            const coalEmissions = {{ emission.coal_emissions|default:"0" }};
+            const dieselEmissions = {{ emission.diesel_emissions|default:"0" }};
+            const petrolEmissions = {{ emission.petrol_emissions|default:"0" }};
+            const explosiveEmissions = {{ emission.explosive_emissions|default:"0" }};
+            const electricityEmissions = {{ emission.electricity_emissions|default:"0" }};
+            const transportEmissions = {{ emission.transport_emissions|default:"0" }};
+            const methaneEmissions = {{ emission.methane_emissions|default:"0" }};
+            const overburdenEmissions = {{ emission.overburden_emissions|default:"0" }};
+            
+            // Filter out zero values and prepare labels and data
+            const emissionsData = [
+                { label: 'Coal Production', value: coalEmissions },
+                { label: 'Diesel Equipment', value: dieselEmissions },
+                { label: 'Petrol Equipment', value: petrolEmissions },
+                { label: 'Explosives', value: explosiveEmissions },
+                { label: 'Electricity', value: electricityEmissions },
+                { label: 'Transportation', value: transportEmissions },
+                { label: 'Methane Emissions', value: methaneEmissions },
+                { label: 'Overburden Removal', value: overburdenEmissions }
+            ].filter(item => item.value > 0);
+            
+            const labels = emissionsData.map(item => item.label);
+            const data = emissionsData.map(item => item.value);
+            
+            // Create the chart
+            const emissionsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4CAF50', '#2196F3', '#FFC107', '#FF5722', 
+                            '#9C27B0', '#3F51B5', '#F44336', '#607D8B'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value.toFixed(2)} tonnes CO₂e (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

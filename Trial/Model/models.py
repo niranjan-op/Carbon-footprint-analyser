@@ -39,11 +39,13 @@ class Constants(models.Model):
     subbituminous_cof = models.FloatField(default=0.98)
     
     # Methane emissions
-    anthracite_ch4 = models.FloatField(default=0.3)
-    bituminous_nc_ch4 = models.FloatField(default=0.3)
-    bituminous_c_ch4 = models.FloatField(default=0.3)
-    lignite_ch4 = models.FloatField(default=0.1)
-    subbituminous_ch4 = models.FloatField(default=0.2)
+    # anthracite_ch4 = models.FloatField(default=0.3)
+    # bituminous_nc_ch4 = models.FloatField(default=0.3)
+    # bituminous_c_ch4 = models.FloatField(default=0.3)
+    # lignite_ch4 = models.FloatField(default=0.1)
+    # subbituminous_ch4 = models.FloatField(default=0.2)
+    
+    
     
     # Equipment emissions
     diesel_ef = models.FloatField(default=2.68)
@@ -57,6 +59,9 @@ class Constants(models.Model):
     
     # Open cast mine specific
     overburden_ef = models.FloatField(default=0.5)
+    csl = models.FloatField(default=0.5)
+    # Waste
+    waste_ef = models.FloatField(default=0.5)
     
     class Meta:
         verbose_name = "Constants"
@@ -107,11 +112,20 @@ class CarbonEmission(models.Model):
     
     # Open cast specific
     overburden_removed = models.FloatField(default=0, help_text="Overburden removed in cubic meters")
-    
+    #Underground (methane)
+    total_ch4 = models.FloatField(default=0)
     # Transportation
     transport_distance = models.FloatField(default=0, help_text="Transport distance in km")
     transport_type = models.ForeignKey(Transport, on_delete=models.SET_NULL, null=True, blank=True)
-    
+    # Add this field
+    land_disturbance = models.FloatField(
+        default=0, 
+        help_text="Land area disturbed in hectares"
+    )
+    #Area Reforested
+    sequestration= models.FloatField(default=0,help_text="Land area reforested in hectar acres")
+    #Waste
+    waste = models.FloatField(default=0)
     # Results
     total_emissions = models.FloatField(default=0, help_text="Total emissions in tonnes CO₂e")
     emissions_per_tonne = models.FloatField(default=0, help_text="Emissions per tonne of coal in tonnes CO₂e/tonne")

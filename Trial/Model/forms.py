@@ -65,17 +65,28 @@ class Configure_Constants_Input(forms.ModelForm):
             'diesel_ef': forms.NumberInput(attrs={'id':'diesel_ef','placeholder':'Enter EF for diesel'}),
             'petrol_ef': forms.NumberInput(attrs={'id':'petrol_ef','placeholder':'Enter EF for petrol'}),
             'grid_emission_factor': forms.NumberInput(attrs={'id':'grid_emission_factor','placeholder':'Enter grid emission factor'}),
-            'anthracite_ch4': forms.NumberInput(attrs={'id':'anthracite_ch4','placeholder':'Enter CH4 for anthracite'}),
-            'bituminous_nc_ch4': forms.NumberInput(attrs={'id':'bituminous_nc_ch4','placeholder':'Enter CH4 for bituminous'}),
-            'bituminous_c_ch4': forms.NumberInput(attrs={'id':'bituminous_c_ch4','placeholder':'Enter CH4 for bituminous'}),
-            'lignite_ch4': forms.NumberInput(attrs={'id':'lignite_ch4','placeholder':'Enter CH4 for lignite'}),
-            'subbituminous_ch4': forms.NumberInput(attrs={'id':'subbituminous_ch4','placeholder':'Enter CH4 for subbituminous'}),
+            # 'anthracite_ch4': forms.NumberInput(attrs={'id':'anthracite_ch4','placeholder':'Enter CH4 for anthracite'}),
+            # 'bituminous_nc_ch4': forms.NumberInput(attrs={'id':'bituminous_nc_ch4','placeholder':'Enter CH4 for bituminous'}),
+            # 'bituminous_c_ch4': forms.NumberInput(attrs={'id':'bituminous_c_ch4','placeholder':'Enter CH4 for bituminous'}),
+            # 'lignite_ch4': forms.NumberInput(attrs={'id':'lignite_ch4','placeholder':'Enter CH4 for lignite'}),
+            # 'subbituminous_ch4': forms.NumberInput(attrs={'id':'subbituminous_ch4','placeholder':'Enter CH4 for subbituminous'}),
             'carbon_sequesteration_rate': forms.NumberInput(attrs={'id':'carbon_sequesteration_rate','placeholder':'Enter carbon sequestration rate'}),
-            'overburden_ef': forms.NumberInput(attrs={'id':'overburden_ef','placeholder':'Enter overburden emission factor'})
+            'overburden_ef': forms.NumberInput(attrs={'id':'overburden_ef','placeholder':'Enter overburden emission factor'}),
+            'csl': forms.NumberInput(attrs={'id':'csl','placeholder':'Enter carbon stock loss '}),
+            'waste_ef': forms.NumberInput(attrs={'id':'waste_ef','placeholder':'Enter waste emission factor'}),
         }
 
 class CalculatorForm(forms.ModelForm):
     """Form for carbon footprint calculation input"""
+    MINE_CHOICES = (
+        ('open_cast', 'Open Cast'),
+        ('underground', 'Underground'),
+    )
+    mine_type = forms.ChoiceField(
+        choices=MINE_CHOICES,
+        widget=forms.RadioSelect(attrs={'onchange': 'toggleMineFields()'})
+    )
+
     class Meta:
         model = CarbonEmission
         fields = [
@@ -91,6 +102,13 @@ class CalculatorForm(forms.ModelForm):
             'electricity_used',
             'overburden_removed',
             'transport_distance',
+            'mine_type',
+            'land_disturbance',
+            'sequestration',
+            'waste',
+            'total_ch4',
+            
+            
         ]
         widgets = {
             'project_name': forms.TextInput(attrs={'placeholder': 'Enter project name'}),
@@ -104,7 +122,12 @@ class CalculatorForm(forms.ModelForm):
             'explosives_used': forms.NumberInput(attrs={'id': 'explosives-used', 'placeholder': 'Enter kg'}),
             'electricity_used': forms.NumberInput(attrs={'id': 'electricity-used', 'placeholder': 'Enter MWh'}),
             'overburden_removed': forms.NumberInput(attrs={'id': 'overburden-removed', 'placeholder': 'Enter cubic meters'}),
-            'transport_distance': forms.NumberInput(attrs={'id': 'transport-distance', 'placeholder': 'Enter km'})
+            'transport_distance': forms.NumberInput(attrs={'id': 'transport-distance', 'placeholder': 'Enter km'}),
+            'land_disturbance':forms.NumberInput(attrs={'id':'land_disturbance','placeholder':'Enter land disturbance'}),
+            'sequestration':forms.NumberInput(attrs={'id':'sequestration','placeholder':'Enter total area reforested'}),
+            'waste':forms.NumberInput(attrs={'id':'waste','placeholder':'Enter waste generated in tonnes'}),
+            'total_ch4': forms.NumberInput(attrs= {'id':'total_ch4','placeholder':'Enter total CH4 emissions'}),
+            
         }
 
 

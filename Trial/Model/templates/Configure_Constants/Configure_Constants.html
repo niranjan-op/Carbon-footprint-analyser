@@ -264,6 +264,7 @@
                 </div>
             </div>
             
+            
             <div class="form-group">
                 <h2>5. Carbon Sequestration Potential</h2>
                 <div class="sub-fields">
@@ -273,14 +274,27 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="form-group">
+                <h2>6. Waste</h2>
+                <div class="sub-fields">
+                <label for="waste_ef">Emission Factor for Waste (kgCO<sub>2</sub>)</label>
+                {{form.waste_ef}}
+            </div>
+            </div>
             <!-- Open Cast specific fields -->
             <div id="open-cast-fields" class="form-group" style="display: none;">
-                <h2>6. Overburdened Removal</h2>
+                <h2>7. Overburdened Removal</h2>
                 <div class="sub-fields">
                     <div class="sub-field-single">
                         <label for="overburden-ef">Average Overburden Emission Factor(kg/m<sup>3</sup>)</label>
                         {{form.overburden_ef}}
+                    </div>
+                </div>
+                <h2>8. Carbon Sequestration Rate</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="carbon-stock-loss">Carbon Stock Loss (tonnes CO<sub>2</sub>)</label>
+                        {{form.csl}}
                     </div>
                 </div>
             </div>

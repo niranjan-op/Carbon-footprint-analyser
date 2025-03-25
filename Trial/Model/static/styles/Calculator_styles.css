@@ -94,7 +94,7 @@ footer p {
 nav {
     background: linear-gradient(to right, #1a1a1a, #333);
     color: #fff;
-    padding: 1rem 2rem;
+    padding: 1rem 1.5rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     display: flex;
     justify-content: space-between;
@@ -102,6 +102,7 @@ nav {
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-wrap: nowrap;
 }
 
 nav ul {
@@ -115,6 +116,7 @@ nav ul {
 nav li {
     display: inline;
     margin: 0 15px;
+    padding: 0 8px;
 }
 
 nav a {
@@ -145,6 +147,20 @@ nav a:after {
 
 nav a:hover:after {
     width: 100%;
+}
+
+.nav-left {
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.nav-right {
+    justify-content: flex-end;
+}
+
+.username {
+    color: #4CAF50;
+    font-weight: bold;
 }
 
 .nav-right a {
@@ -302,7 +318,7 @@ nav a:hover:after {
 /* Form Styling */
 .carbon-footprint-form {
     background: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     margin-top: 20px;
@@ -313,34 +329,214 @@ nav a:hover:after {
     margin-bottom: 20px;
 }
 
-.carbon-footprint-form .form-group {
+.carbon-footprint-form h3 {
+    color: #4CAF50;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.sub-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 20px;
 }
 
-.carbon-footprint-form label {
+.sub-field-pair, .sub-field-single {
+    flex: 1 1 calc(50% - 15px);
+    margin-bottom: 15px;
+}
+
+.sub-field-single {
+    flex-basis: 100%;
+}
+
+label {
     display: block;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
 }
 
-.carbon-footprint-form .sub-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.carbon-footprint-form .sub-field-pair {
-    flex: 1 1 calc(50% - 10px);
-}
-
-.carbon-footprint-form .sub-field-single {
-    flex: 1 1 100%;
-}
-
-.carbon-footprint-form .sub-fields input,
-.carbon-footprint-form .form-group input {
+input[type="number"], input[type="text"] {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+/* Radio Button Styling */
+.carbon-footprint-form .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.carbon-footprint-form .radio-item {
+    display: flex;
+    align-items: center;
+}
+
+.carbon-footprint-form .radio-item input[type="radio"] {
+    margin-right: 10px;
+    width: auto;
+}
+
+.carbon-footprint-form .radio-item label {
+    display: inline;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+@media (min-width: 768px) {
+    .carbon-footprint-form .radio-group {
+        flex-direction: row;
+        gap: 30px;
+    }
+}
+
+/* Config Notice */
+.config-notice {
+    display: flex;
+    background-color: #e9f5e9;
+    border-left: 4px solid #4CAF50;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.notice-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.notice-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2e7d32;
+}
+
+.notice-content p {
+    margin-bottom: 15px;
+}
+
+.config-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.config-button:hover {
+    background-color: #3d8b40;
+    transform: translateY(-2px);
+}
+
+.button-icon {
+    margin-left: 8px;
+}
+
+/* Mine-type specific fields */
+#open-cast-fields, #underground-fields, #carbon-stock-methane {
+    display: none;
+    margin-top: 20px;
+}
+
+#open-cast-fields .form-group, #underground-fields .form-group, #carbon-stock-methane .form-group {
+    margin-bottom: 20px;
+}
+
+/* Explosives and Transport Fields */
+.explosives-container, .transport-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+    border: 1px solid #eee;
+    padding: 15px;
     border-radius: 5px;
+}
+
+.explosive-field, .transport-field {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.no-data-message {
+    grid-column: 1 / -1;
+    padding: 15px;
+    background-color: #fff8e1;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+}
+
+.no-data-message a {
+    color: #4CAF50;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+/* Submit Button */
+.form-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #3d8b40;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .sub-field-pair, .sub-field-single {
+        flex: 1 1 100%;
+    }
+    
+    .explosives-container, .transport-container {
+        grid-template-columns: 1fr;
+    }
 }
