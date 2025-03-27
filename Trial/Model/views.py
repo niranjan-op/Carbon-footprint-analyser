@@ -1,21 +1,30 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import Configure_Constants_Input, ExplosiveForm, TransportForm, CalculatorForm
 from .models import Constants, Explosive, Transport, CarbonEmission
-from .Calculation import Carbon_Production
+from .Calculation import *
 import numpy as np
 
 def Calculator(request):
+    # Check if there's an emission_id in the request to load past project data
+    emission_id = request.GET.get('emission_id')
+    past_emission = None
+    
+    if emission_id:
+        # Load the past emission data for editing/viewing
+        past_emission = get_object_or_404(CarbonEmission, id=emission_id)
+        # Check if the user owns this emission data
+        if request.user.is_authenticated and past_emission.user != request.user:
+            messages.error(request, "You don't have permission to view this project.")
+            return redirect('Model:Calculator')
+    
     # Get the most recent constants set, or create default if none exists
     constants = None
     if request.user.is_authenticated:
         constants = Constants.objects.filter(user=request.user).order_by('-updated_at').first()
-    
-    if constants is None:
-        constants = Constants.objects.filter(user=None).order_by('-updated_at').first()
-        
+                
     if constants is None:
         # Create default constants if none exist
         constants = Constants.objects.create(name="Default Constants")
@@ -28,11 +37,42 @@ def Calculator(request):
         Transport.objects.create(constants=constants, transport_type="Dumper (20 tonne)", emission_factor=0.11)
         Transport.objects.create(constants=constants, transport_type="Truck (40 tonne)", emission_factor=0.16)
     
-    form = CalculatorForm()
+    # Initialize form with past project data if available
+    initial_data = {}
+    if past_emission:
+        # Get values from the past emission to prefill the form
+        for field in CalculatorForm.Meta.fields:
+            if field != 'mine_type':  # Skip mine_type as it's not in the model
+                if hasattr(past_emission, field):
+                    initial_data[field] = getattr(past_emission, field)
+        
+        # Determine mine_type based on data in the emission
+        if past_emission.total_ch4 > 0:
+            initial_data['mine_type'] = 'underground'
+        else:
+            initial_data['mine_type'] = 'open_cast'
+        
+        form = CalculatorForm(initial=initial_data)
+    else:
+        form = CalculatorForm()
     
     # Get explosives and transports from constants for form processing
     explosives = constants.explosives.all()
     transports = constants.transports.all()
+    
+    # Prepare data for pre-filling explosive and transport fields
+    explosive_data = {}
+    transport_data = {}
+    
+    if past_emission:
+        # This could be expanded if you store detailed explosive and transport usage
+        # For now, we'll just use what we have
+        explosive_data = {
+            'total_explosives': past_emission.explosives_used
+        }
+        transport_data = {
+            'total_transport': past_emission.transport_distance
+        }
     
     # Add explosives and transport fields dynamically
     if request.method == 'POST':
@@ -44,6 +84,9 @@ def Calculator(request):
                 emission.user = request.user
                 
             emission.constants = constants
+            
+            # Get mine type from the form data but don't save it to the model
+            mine_type = request.POST.get('mine_type', 'open_cast')
             
             # Process custom explosive values
             total_explosive_emissions = 0
@@ -67,41 +110,77 @@ def Calculator(request):
             emission.explosive_emissions = total_explosive_emissions
             emission.transport_emissions = total_transport_emissions
 
-            # Get mine type from the form data
-            mine_type = request.POST.get('mine_type', 'open_cast')
+            # Process project name from the form
+            if 'project_name' in request.POST and request.POST['project_name']:
+                emission.project_name = request.POST['project_name']
             
-            carbon_prod=[emission.anthracite,emission.bituminous_coking,emission.bituminous_non_coking,emission.subbituminous,emission.lignite]
-            coal_type_conv=[emission.anthractie_cf,emission.bituminous_c_cf,emission.bituminous_nc_cf,emission.subbituminous_cf,emission.lignite_cf]
-            carbon_content=[emission.anthracite_cc,emission.bituminuous_c_cc,emission.bituminuous_nc_cc,emission.subbituminous_cc,emission.lignite_cc]
-            cof=[emission.anthracite_cof,emission.bituminuous_c_cof,emission.bituminuous_nc_cof,emission.subbituminous_cof,emission.lignite_cof]
-            Carbon_footprint=Carbon_Production(constants.exclusion_fact ,carbon_prod,carbon_content,coal_type_conv,cof)
-            if mine_type =='open_cast':
-                Carbon_footprint+=np.mul(emission.overburden,emission.overburden_ef)
-                Carbon_footprint+=np.mul(emission.land_disturbance,csl)
-            elif mine_type=='underground':
-                Carbon_footprint+=np.mul(emission.total_ch4,0.00067,25)
+            carbon_prod = [emission.anthracite, emission.bituminous_coking, emission.bituminous_non_coking, 
+                           emission.subbituminous, emission.lignite]
+            coal_type_conv = [constants.anthracite_cf, constants.bituminous_c_cf, constants.bituminous_nc_cf, 
+                             constants.subbituminous_cf, constants.lignite_cf]
+            carbon_content = [constants.anthracite_cc, constants.bituminous_c_cc, constants.bituminous_nc_cc, 
+                             constants.subbituminous_cc, constants.lignite_cc]
+            cof = [constants.anthracite_cof, constants.bituminous_c_cof, constants.bituminous_nc_cof, 
+                  constants.subbituminous_cof, constants.lignite_cof]
+
+            Carbon_footprint = Carbon_Production(constants.exclusion_fact, carbon_prod, carbon_content, coal_type_conv, cof)
+            print(Carbon_footprint)
+
+            if mine_type == 'open_cast':
+                Carbon_footprint += np.multiply(emission.overburden_removed, constants.overburden_ef)
+                print(Carbon_footprint)
+                Carbon_footprint += np.multiply(emission.land_disturbance, constants.csl)
+                print(Carbon_footprint)
+            elif mine_type == 'underground':
+                Carbon_footprint += np.multiply(np.multiply(emission.total_ch4, 0.00067), 25)
+                print(Carbon_footprint)
+
             # Equipment and Fuel Emissions:
-            Carbon_footprint+=np.mul(emission.diesel_used,constants.diesel_ef)
-            Carbon_footprint+=np.mul(emission.petrol_used,constants.petrol_ef)
+            Carbon_footprint += FuelEmissions(constants.diesel_ef, emission.diesel_used)
+            print(Carbon_footprint)
+            Carbon_footprint += FuelEmissions(constants.petrol_ef, emission.petrol_used)
+            print(Carbon_footprint)
+
             # Electricity Emissions:
-            Carbon_footprint+=np.mul(emission.electricity_used,constants.grid_emission_factor)
-            # Sequestration:
-            Carbon_footprint-=np.mul(emission.sequestration,constants.carbon_sequestration_rate)
+            Carbon_footprint += ElecEmissions(emission.electricity_used, constants.grid_emission_factor)
+            print(Carbon_footprint)
+
             # Waste:
-            Carbon_footprint+=np.mul(emission.waste,constants.waste_ef)
-            Carbon_footprint+=total_explosive_emissions+total_transport_emissions
-            
-            emission.save()
-            return render(request, 'Calculator/Results.html', {'emission': emission})
+            Carbon_footprint += WasteEmissions(emission.waste, constants.waste_ef)
+            print(Carbon_footprint)
+            Carbon_footprint += total_explosive_emissions + total_transport_emissions
+            print(Carbon_footprint)
+            Net_Carbon_Footprint = Carbon_footprint - emission.sequestration
+            print(Carbon_footprint)
+            emission.Carbon_footprint = Carbon_footprint
+
+            # Check if the save_draft button was clicked
+            if 'save_draft' in request.POST:
+                emission.is_draft = True
+                emission.save()
+                messages.success(request, "Draft saved successfully.")
+                return redirect('Model:Calculator')
+            else:
+                # Finalize calculation (draft remains False)
+                emission.is_draft = False
+                emission.save()
+                return render(request, 'Calculator/Results.html', {'emission': emission})
+        else:
+            # Debug: print form errors to the terminal
+            print("Form errors:", form.errors)
+            messages.error(request, "There was an error saving the form. Please check your input.")    
     
     context = {
         'form': form,
         'constants': constants,
         'explosives': explosives,
         'transports': transports,
+        'past_emission': past_emission,
+        'explosive_data': explosive_data,
+        'transport_data': transport_data,
     }
-    
-    return render(request, 'Calculator/Results.html', context)
+        
+    return render(request, 'Calculator/Calculator.html', context)
 
 
 def Configure_Constants(request):
@@ -224,24 +303,12 @@ def Configure_Constants(request):
         'transport_forms': transport_forms
     })
 
-def view_saved_constants(request):
-    """View to list all saved constant sets"""
-    if request.user.is_authenticated:
-        constants_sets = Constants.objects.filter(user=request.user).order_by('-updated_at')
-    else:
-        constants_sets = []
-        
-    return render(request, 'Configure_Constants/saved_constants.html', {
-        'constants_sets': constants_sets
-    })
+def Results(request, emission_id):
+    emission = get_object_or_404(CarbonEmission, id=emission_id)
+    return render(request, 'Calculator/Results.html', {'emission': emission})
 
-def view_emission_history(request):
-    """View to list all saved emission calculations"""
-    if request.user.is_authenticated:
-        emissions = CarbonEmission.objects.filter(user=request.user).order_by('-calculation_date')
-    else:
-        emissions = []
-        
-    return render(request, 'Calculator/emission_history.html', {
-        'emissions': emissions
-    })
+@login_required
+def past_projects(request):
+    # Get CarbonEmission objects for the current user
+    projects = CarbonEmission.objects.filter(user=request.user)
+    return render(request, 'Calculator/past_projects.html', {'projects': projects})

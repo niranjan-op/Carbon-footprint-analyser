@@ -27,6 +27,30 @@
     <div class="container">
         <form class="carbon-footprint-form" method="POST">
             {% csrf_token %}
+            
+            {% if not user.is_authenticated %}
+            {% include 'alerts/login_required_alert.html' %}
+            {% else %}
+            <div>
+                <p>View previous projects:</p>
+                <a href="{% url 'Model:past_projects' %}">Past projects</a>
+            </div>
+            {% endif %}
+            
+            {% if past_emission %}
+            <div class="edit-project-notice">
+                <div class="notice-icon">📝</div>
+                <div class="notice-content">
+                    <h3>Editing Project: {{ past_emission.project_name }}</h3>
+                    <p>You are currently viewing/editing input values from your past project. Make changes and recalculate, or go back to results.</p>
+                    <a href="{% url 'Model:Results' past_emission.id %}" class="config-button">
+                        <span class="button-text">Back to Results</span>
+                        <span class="button-icon">→</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="config-notice">
                 <div class="notice-icon">⚙️</div>
                 <div class="notice-content">
@@ -39,6 +63,19 @@
                 </div>
             </div>
             <h1>Carbon footprint analyser</h1>
+            
+            <!-- Add a project name field if editing a past project -->
+            {% if past_emission %}
+            <div class="form-group">
+                <label for="project_name">Project Name</label>
+                <input type="text" id="project_name" name="project_name" value="{{ past_emission.project_name }}" required>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label for="project_name">Project Name</label>
+                <input type="text" id="project_name" name="project_name" placeholder="Enter a name for this project" required>
+            </div>
+            {% endif %}
             
             <div class="form-group">
                 <h2>1. Mining Activities</h2>
@@ -126,7 +163,8 @@
                             <label for="explosive_{{ explosive.id }}_amount">{{ explosive.explosive_type }} (kg)</label>
                             <input type="number" id="explosive_{{ explosive.id }}_amount" 
                                    name="explosive_{{ explosive.id }}_amount" step="0.01"
-                                   placeholder="Enter amount (kg)" class="explosive-input">
+                                   placeholder="Enter amount (kg)" class="explosive-input" 
+                                   {% if past_emission %}value="{{ explosive_data.total_explosives|default:'0' }}"{% endif %} required>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -145,7 +183,8 @@
                             <label for="transport_{{ transport.id }}_distance">{{ transport.transport_type }} (km)</label>
                             <input type="number" id="transport_{{ transport.id }}_distance" 
                                    name="transport_{{ transport.id }}_distance" step="0.01"
-                                   placeholder="Enter distance (km)" class="transport-input">
+                                   placeholder="Enter distance (km)" class="transport-input"
+                                   {% if past_emission %}value="{{ transport_data.total_transport|default:'0' }}"{% endif %}>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -172,8 +211,11 @@
 
 
             
-            <div class="form-actions">
+            <div class="form-actions" action="POST">
                 <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
+                {% if past_emission %}
+                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.id %}'">Cancel</button>
+                {% endif %}
             </div>
         </form>
     </div>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Projects</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/past_projects.css' %}">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Past Projects</h1>
+        {% if projects %}
+            <div class="cards">
+                {% for project in projects %}
+                    <div class="card">
+                        <h2>{{ project.project_name }}</h2>
+                        <p class="date"><strong>Date:</strong> {{ project.calculation_date|date:"F d, Y" }}</p>
+                        <!-- Add brief info, e.g. total emissions -->
+                        <p class="brief-info"><strong>Total Emissions:</strong> {{ project.Carbon_footprint|floatformat:2 }} tonnes CO₂e</p>
+                        <div class="card-actions">
+                            <a href="{% url 'Model:Results' project.id %}" class="button">View Results</a>
+                            <a href="{% url 'Model:Calculator' %}?emission_id={{project.id}}" class="button edit-button">Edit Inputs</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-projects">No projects found.</p>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/past_projects.js' %}"></script>
+</body>
+</html>

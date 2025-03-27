@@ -18,10 +18,10 @@ class ConstantsAdmin(admin.ModelAdmin):
 
 @admin.register(CarbonEmission)
 class CarbonEmissionAdmin(admin.ModelAdmin):
-    list_display = ('project_name', 'user', 'calculation_date', 'total_emissions', 'emissions_per_tonne')
+    list_display = ('project_name', 'user', 'calculation_date', 'Carbon_footprint')
     list_filter = ('user', 'calculation_date')
     search_fields = ('project_name', 'user__username')
-    readonly_fields = ('calculation_date', 'total_emissions', 'emissions_per_tonne')
+    readonly_fields = ('calculation_date', 'Carbon_footprint')
     
     fieldsets = (
         ('Project Information', {
@@ -37,8 +37,8 @@ class CarbonEmissionAdmin(admin.ModelAdmin):
             'fields': ('transport_distance', 'transport_type')
         }),
         ('Results', {
-            'fields': ('total_emissions', 'emissions_per_tonne', 'coal_emissions', 'diesel_emissions', 
-                      'petrol_emissions', 'explosive_emissions', 'electricity_emissions', 
-                      'transport_emissions', 'methane_emissions', 'overburden_emissions')
+            'fields': ('Carbon_footprint', 'coal_emissions', 'diesel_emissions', 
+                       'petrol_emissions', 'explosive_emissions', 'electricity_emissions', 
+                       'transport_emissions', 'methane_emissions', 'overburden_emissions')
         }),
     )

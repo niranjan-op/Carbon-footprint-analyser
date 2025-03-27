@@ -14,7 +14,6 @@ class Constants(models.Model):
         ('underground', 'Underground Coal Mine'),
     )
     mine_type = models.CharField(max_length=20, choices=MINE_TYPE_CHOICES, default='open-cast')
-    
     # Coal type conversion factors
     anthracite_cf = models.FloatField(default=26.8)
     bituminous_nc_cf = models.FloatField(default=25.8)
@@ -22,7 +21,7 @@ class Constants(models.Model):
     lignite_cf = models.FloatField(default=(14.1))
     subbituminous_cf = models.FloatField(default=18.9)
     conv_fact = models.FloatField(default=4.1868)
-    exclusion_fact = models.FloatField(default=12.0)
+    exclusion_fact = models.FloatField(default=0.17)
     
     # Carbon content
     anthracite_cc = models.FloatField(default=26.8)
@@ -127,9 +126,11 @@ class CarbonEmission(models.Model):
     #Waste
     waste = models.FloatField(default=0)
     # Results
-    total_emissions = models.FloatField(default=0, help_text="Total emissions in tonnes CO₂e")
-    emissions_per_tonne = models.FloatField(default=0, help_text="Emissions per tonne of coal in tonnes CO₂e/tonne")
-    
+    #total_emissions = models.FloatField(default=0, help_text="Total emissions in tonnes CO₂e")
+    #emissions_per_tonne = models.FloatField(default=0, help_text="Emissions per tonne of coal in tonnes CO₂e/tonne")
+    Carbon_footprint = models.FloatField(default=0, help_text="Carbon footprint in tonnes CO₂e")
+    # Add the draft flag:
+    is_draft = models.BooleanField(default=False)
     # Breakdown of emissions
     coal_emissions = models.FloatField(default=0)
     diesel_emissions = models.FloatField(default=0)
@@ -139,6 +140,7 @@ class CarbonEmission(models.Model):
     transport_emissions = models.FloatField(default=0)
     methane_emissions = models.FloatField(default=0)
     overburden_emissions = models.FloatField(default=0)
+    Carbon_footprint= models.FloatField(default=0)
     
     class Meta:
         verbose_name = "Carbon Emission"

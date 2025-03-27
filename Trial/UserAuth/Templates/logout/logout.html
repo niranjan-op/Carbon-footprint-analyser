@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logged Out</title>
+    <title>Logout Confirmation</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
 </head>
@@ -16,10 +16,17 @@
         </ul>
     </nav>
     <div class="content">
-        <h1>Logged Out</h1>
-        <p>You have been successfully logged out.</p>
-        <p><a href="{% url 'login' %}">Login again</a></p>
-        <p><a href="{% url 'home' %}">Return to home page</a></p>
+        <div class="logout-confirmation">
+            <h1>Logout Confirmation</h1>
+            <p>Are you sure you want to log out?</p>
+            <div class="confirmation-buttons">
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Yes, Log Out</button>
+                </form>
+                <a href="{% url 'home' %}" class="cancel-button">No, Take Me Back</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>

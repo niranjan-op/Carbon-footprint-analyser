@@ -88,246 +88,294 @@ nav a:hover:after {
     font-weight: bold;
 }
 
-.nav-right a {
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: all 0.3s;
-}
-
-.nav-right a:hover {
-    background-color: #4CAF50;
-    color: white;
-}
-
-/* Results Card Styling */
-.results-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    padding: 30px;
-    margin-bottom: 30px;
-}
-
+/* Results Header */
 .results-header {
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    margin: 40px 0;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #e9e9e9;
 }
 
 .results-header h1 {
     color: #333;
+    font-size: 2.5rem;
     margin-bottom: 10px;
 }
 
-.project-info, .date-info {
-    color: #666;
-    margin: 5px 0;
+.timestamp {
+    color: #888;
+    font-style: italic;
 }
 
-/* Results Summary Styling */
+/* Results Summary */
 .results-summary {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-around;
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
 }
 
-.total-emissions, .emissions-per-tonne {
+.summary-card {
+    flex: 1;
+    max-width: 45%;
+    padding: 30px;
+    margin: 0 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    padding: 15px;
 }
 
-.total-emissions h2, .emissions-per-tonne h3 {
-    margin-bottom: 15px;
-    color: #333;
+.summary-card h2 {
+    margin-top: 0;
+    color: #444;
+    font-size: 1.5rem;
 }
 
-.emissions-value {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.summary-card.total {
+    background-color: #4CAF50;
+    color: white;
 }
 
-.value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #4CAF50;
+.summary-card.per-tonne {
+    background-color: #2196F3;
+    color: white;
 }
 
-.total-emissions .value {
+.result-value {
+    margin-top: 20px;
+}
+
+.result-value .number {
     font-size: 3rem;
+    font-weight: bold;
+    line-height: 1;
+    display: block;
+    margin-bottom: 10px;
 }
 
-.unit {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 5px;
+.result-value .unit {
+    font-size: 1.1rem;
+    opacity: 0.8;
 }
 
-/* Emissions Breakdown Styling */
-.emissions-breakdown, .coal-production-summary {
+/* Charts Section */
+.results-charts {
+    margin: 50px 0;
+}
+
+.chart-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
-}
-
-.emissions-breakdown h2, .coal-production-summary h2 {
-    color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.breakdown-chart-container {
     height: 400px;
+}
+
+.chart-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Detailed Results */
+.detailed-results {
+    margin: 50px 0;
+}
+
+.detailed-results h2 {
+    color: #333;
+    border-bottom: 2px solid #e9e9e9;
+    padding-bottom: 10px;
     margin-bottom: 30px;
 }
 
-/* Table Styling */
-.breakdown-table, .coal-table {
-    overflow-x: auto;
+.results-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
 }
 
-table {
+.results-section h3 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.results-section.positive-impact h3 {
+    color: #1976D2;
+}
+
+.results-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
 }
 
-table th, table td {
+.results-table th, .results-table td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e9e9e9;
 }
 
-table th {
-    background-color: #f4f4f4;
+.results-table th {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+
+.results-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Recommendations */
+.recommendations {
+    margin: 50px 0;
+}
+
+.recommendations h2 {
     color: #333;
-    font-weight: bold;
+    border-bottom: 2px solid #e9e9e9;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 
-table tbody tr:hover {
-    background-color: #f9f9f9;
+.recommendation-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
 }
 
-table tfoot {
-    font-weight: bold;
+.recommendation-card h3 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
-table tfoot th {
-    background-color: #e9f5e9;
+.recommendation-card ul {
+    padding-left: 20px;
 }
 
-/* Button Styling */
+.recommendation-card li {
+    margin-bottom: 10px;
+}
+
+/* Action Buttons */
 .action-buttons {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
-    flex-wrap: wrap;
+    gap: 20px;
+    margin: 50px 0 30px;
 }
 
 .button {
     display: inline-block;
-    padding: 12px 24px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 12px 25px;
+    background: #4CAF50;
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 500;
-    text-decoration: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s;
 }
 
 .button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: #3d8b40;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
 .button.secondary {
-    background-color: #2196F3;
+    background: #2196F3;
 }
 
 .button.secondary:hover {
-    background-color: #0b7dda;
+    background: #1976D2;
 }
 
 .button.print-button {
-    background-color: #FF9800;
+    background: #757575;
 }
 
 .button.print-button:hover {
-    background-color: #e68a00;
+    background: #616161;
 }
 
-/* Print Styles */
+/* Print styles */
 @media print {
     nav, .action-buttons {
         display: none;
+    }
+    
+    .container {
+        width: 100%;
+        padding: 0;
     }
     
     body {
         background-color: white;
     }
     
-    .container {
-        width: 100%;
-        padding: 0;
+    .chart-container {
+        page-break-inside: avoid;
     }
     
-    .results-card {
+    .results-section {
         box-shadow: none;
-        padding: 0;
+        border: 1px solid #e9e9e9;
+        page-break-inside: avoid;
     }
     
-    .breakdown-chart-container {
-        height: 300px;
+    .recommendation-card {
+        box-shadow: none;
+        border: 1px solid #e9e9e9;
+        page-break-inside: avoid;
     }
 }
 
-/* Responsive Styles */
+/* Responsive adjustments */
 @media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+    
     nav {
         flex-direction: column;
-        padding: 10px;
+        padding: 0.5rem;
     }
     
     nav ul {
         flex-direction: column;
         width: 100%;
-        margin: 10px 0;
     }
     
     nav li {
         margin: 5px 0;
     }
     
-    .container {
-        width: 95%;
-        padding: 10px;
-    }
-    
-    .results-card {
-        padding: 15px;
-    }
-    
-    .total-emissions, .emissions-per-tonne {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-    
-    .value {
+    .results-header h1 {
         font-size: 2rem;
     }
     
-    .total-emissions .value {
-        font-size: 2.5rem;
+    .summary-card {
+        max-width: 100%;
+        margin: 0 0 20px;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .detailed-results h2, .recommendations h2 {
+        font-size: 1.5rem;
     }
     
     .action-buttons {
@@ -337,5 +385,27 @@ table tfoot th {
     
     .button {
         width: 100%;
+        text-align: center;
+    }
+}
+
+/* For smaller mobile screens */
+@media (max-width: 480px) {
+    .results-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .result-value .number {
+        font-size: 2.5rem;
+    }
+    
+    .results-table th, .results-table td {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .chart-container {
+        padding: 15px;
+        height: 250px;
     }
 }

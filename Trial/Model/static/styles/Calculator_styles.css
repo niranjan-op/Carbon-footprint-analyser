@@ -540,3 +540,48 @@ input[type="number"]:focus, input[type="text"]:focus {
         grid-template-columns: 1fr;
     }
 }
+
+/* Edit Project Notice */
+.edit-project-notice {
+    display: flex;
+    background-color: #e9f5f9;
+    border-left: 4px solid #007BFF;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.edit-project-notice .notice-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.edit-project-notice .notice-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #0056b3;
+}
+
+.edit-project-notice .notice-content p {
+    margin-bottom: 15px;
+}
+
+/* Cancel Button */
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
