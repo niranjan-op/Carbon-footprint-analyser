@@ -46,9 +46,9 @@
             </div>
             
             <div class="summary-card per-tonne">
-                <h2>Emissions Per Tonne</h2>
+                <h2>Net Carbon Footprint</h2>
                 <div class="result-value">
-                    <span class="number">{{ emission.Carbon_footprint|floatformat:2 }}</span>
+                    <span class="number">{{ emission.Net_Carbon_Footprint|floatformat:2 }}</span>
                     <span class="unit">tonnes CO₂e/tonne</span>
                 </div>
             </div>
@@ -228,10 +228,16 @@
         </div>
 
         <div class="action-buttons">
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
             <a href="{% url 'Model:Calculator' %}" class="button">New Calculation</a>
-            <a href="{% url 'Model:Configure_Constants' %}" class="button secondary">Configure Constants</a>
-            <a href="{% url 'Model:Calculator' %}?emission_id={{emission.id}}" class="button edit-button">View/Edit Input Values</a>
-            <a href="{% url 'Model:Calculator' %}" class="button secondary">Input Values</a>
+            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.project_name }}" class="config-button">
+                <span class="button-text">Configure Constants</span>
+                <span class="button-icon">⚙️</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}?project_name={{emission.project_name}}" class="button edit-button">View/Edit Input Values</a>
             <button class="button print-button" onclick="window.print()">Print Results</button>
         </div>
     </div>

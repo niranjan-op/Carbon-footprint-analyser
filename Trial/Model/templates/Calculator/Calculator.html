@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     {% load static %}
+    {% load model_extras %}
+    {% load dict_extras %}
     <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
 </head>
 <body>
@@ -43,7 +45,7 @@
                 <div class="notice-content">
                     <h3>Editing Project: {{ past_emission.project_name }}</h3>
                     <p>You are currently viewing/editing input values from your past project. Make changes and recalculate, or go back to results.</p>
-                    <a href="{% url 'Model:Results' past_emission.id %}" class="config-button">
+                    <a href="{% url 'Model:Results' past_emission.project_name %}" class="config-button">
                         <span class="button-text">Back to Results</span>
                         <span class="button-icon">→</span>
                     </a>
@@ -155,7 +157,6 @@
                 </div>
                 
                 <!-- Explosives Section -->
-                <h3>Explosives Used</h3>
                 <div class="explosives-container">
                     {% if explosives %}
                         {% for explosive in explosives %}
@@ -164,7 +165,7 @@
                             <input type="number" id="explosive_{{ explosive.id }}_amount" 
                                    name="explosive_{{ explosive.id }}_amount" step="0.01"
                                    placeholder="Enter amount (kg)" class="explosive-input" 
-                                   {% if past_emission %}value="{{ explosive_data.total_explosives|default:'0' }}"{% endif %} required>
+                                   value="{{ explosive_data|get_dict_item:explosive.id }}">
                         </div>
                         {% endfor %}
                     {% else %}
@@ -184,7 +185,7 @@
                             <input type="number" id="transport_{{ transport.id }}_distance" 
                                    name="transport_{{ transport.id }}_distance" step="0.01"
                                    placeholder="Enter distance (km)" class="transport-input"
-                                   {% if past_emission %}value="{{ transport_data.total_transport|default:'0' }}"{% endif %}>
+                                   value="{{ transport_data|get_dict_item:transport.id }}">
                         </div>
                         {% endfor %}
                     {% else %}
@@ -214,7 +215,7 @@
             <div class="form-actions" action="POST">
                 <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
                 {% if past_emission %}
-                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.id %}'">Cancel</button>
+                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.project_name %}'">Cancel</button>
                 {% endif %}
             </div>
         </form>

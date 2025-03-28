@@ -36,6 +36,9 @@
     <div class="container">
         <form class="carbon-footprint-form" method="POST">
             {% csrf_token %}
+            {% if emission_id %}
+            <input type="hidden" name="emission_id" value="{{ emission_id }}">
+            {% endif %}
             <h1>Configure Constants</h1>
             <h2>1. Coal</h2>
             <div class="form-group">
@@ -299,6 +302,10 @@
                 </div>
             </div>
             <button type="submit" class="button" action="POST">Save Constants</button>
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
         </form>
     </div>
 

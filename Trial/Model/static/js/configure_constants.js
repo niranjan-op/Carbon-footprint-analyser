@@ -21,6 +21,65 @@ function toggleMineFields() {
     }
 }
 
+// Initialize forms with existing data
+function initializeFormsWithData() {
+    console.log("Initializing forms with existing data");
+    
+    // For explosives - mark if we have initial data
+    const explosiveFields = document.getElementsByClassName('explosive-fields');
+    if (explosiveFields.length > 0) {
+        console.log(`Found ${explosiveFields.length} explosive fields with data`);
+        
+        // Update the count field
+        document.getElementById('explosives-count').value = explosiveFields.length;
+        
+        // Make sure all explosive fields have their data loaded and are visible
+        Array.from(explosiveFields).forEach((field, index) => {
+            // Ensure proper ID/labels
+            const fieldId = index + 1;
+            
+            // If there's a heading, update it
+            const heading = field.querySelector('h5');
+            if (heading) {
+                heading.textContent = `Explosive #${fieldId}`;
+            }
+            
+            // Make sure the field is visible
+            field.style.display = 'block';
+        });
+    } else {
+        console.log("No explosive fields found, adding default");
+        addExplosiveField();
+    }
+    
+    // For transports - same approach
+    const transportFields = document.getElementsByClassName('transportation-fields');
+    if (transportFields.length > 0) {
+        console.log(`Found ${transportFields.length} transport fields with data`);
+        
+        // Update the count field
+        document.getElementById('transport-count').value = transportFields.length;
+        
+        // Make sure all transport fields have their data loaded and are visible
+        Array.from(transportFields).forEach((field, index) => {
+            // Ensure proper ID/labels
+            const fieldId = index + 1;
+            
+            // If there's a heading, update it
+            const heading = field.querySelector('h4');
+            if (heading) {
+                heading.textContent = `Transport #${fieldId}`;
+            }
+            
+            // Make sure the field is visible
+            field.style.display = 'block';
+        });
+    } else {
+        console.log("No transport fields found, adding default");
+        addTransportField();
+    }
+}
+
 function generateExplosiveFields() {
     const container = document.getElementById('explosives-container');
     const count = parseInt(document.getElementById('explosives-count').value);
@@ -221,6 +280,31 @@ function toggleNavMenu() {
 let transportCount = 0;
 let explosiveCount = 0;
 
+// Additional code to log any values loaded from server
+function logInitialValues() {
+    // For explosives
+    const explosiveFields = document.getElementsByClassName('explosive-fields');
+    Array.from(explosiveFields).forEach((field, index) => {
+        const typeInput = field.querySelector('.explosive-type');
+        const emissionInput = field.querySelector('.explosive-emission');
+        
+        if (typeInput && emissionInput) {
+            console.log(`Explosive #${index+1}: ${typeInput.value} (${emissionInput.value} kg CO₂/kg)`);
+        }
+    });
+    
+    // For transports
+    const transportFields = document.getElementsByClassName('transportation-fields');
+    Array.from(transportFields).forEach((field, index) => {
+        const typeInput = field.querySelector('.transport-type');
+        const emissionInput = field.querySelector('.transport-emission');
+        
+        if (typeInput && emissionInput) {
+            console.log(`Transport #${index+1}: ${typeInput.value} (${emissionInput.value} kg CO₂/km)`);
+        }
+    });
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing form...");
@@ -233,29 +317,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     toggleMineFields();
     
+    // Initialize the forms with any existing data
+    initializeFormsWithData();
+    
     // Check if underground is already selected
     if (document.getElementById('id_mine_type_1') && document.getElementById('id_mine_type_1').checked) {
         document.getElementById('carbon-stock-methane').style.display = 'block';
     }
     
-    // First update counts of existing fields
-    updateExplosiveCount();
-    updateTransportCount();
-    
-    // If there are no explosive fields, add one
-    const explosiveFields = document.getElementsByClassName('explosive-fields');
-    console.log(`Found ${explosiveFields.length} explosive fields`);
-    if (explosiveFields.length === 0) {
-        addExplosiveField();
-    }
-    
-    // If there are no transport fields, add one
-    const transportFields = document.getElementsByClassName('transportation-fields');
-    console.log(`Found ${transportFields.length} transport fields`);
-    if (transportFields.length === 0) {
-        addTransportField();
-    }
-
     // Update the count fields before form submission
     const form = document.querySelector('form.carbon-footprint-form');
     if (form) {
@@ -270,4 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error("Form not found!");
     }
+    
+    // Debug output to see what existing data we have
+    console.log("Initial explosive count: ", document.getElementById('explosives-count').value);
+    console.log("Initial transport count: ", document.getElementById('transport-count').value);
+    
+    // Wait a moment for all fields to be properly initialized
+    setTimeout(logInitialValues, 500);
 });

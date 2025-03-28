@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 class Constants(models.Model):
     """Model to store configuration constants for carbon footprint calculations"""
@@ -94,7 +95,7 @@ class CarbonEmission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     constants = models.ForeignKey(Constants, on_delete=models.SET_NULL, null=True)
     calculation_date = models.DateTimeField(auto_now_add=True)
-    project_name = models.CharField(max_length=200, default="Unnamed Project")
+    project_name = models.CharField(max_length=200, default="Unnamed Project", primary_key=True,null=False)
     
     # Coal production values
     anthracite = models.FloatField(default=0, help_text="Anthracite production in tonnes")
@@ -130,7 +131,7 @@ class CarbonEmission(models.Model):
     #emissions_per_tonne = models.FloatField(default=0, help_text="Emissions per tonne of coal in tonnes CO₂e/tonne")
     Carbon_footprint = models.FloatField(default=0, help_text="Carbon footprint in tonnes CO₂e")
     # Add the draft flag:
-    is_draft = models.BooleanField(default=False)
+    #is_draft = models.BooleanField(default=False)
     # Breakdown of emissions
     coal_emissions = models.FloatField(default=0)
     diesel_emissions = models.FloatField(default=0)
@@ -141,6 +142,33 @@ class CarbonEmission(models.Model):
     methane_emissions = models.FloatField(default=0)
     overburden_emissions = models.FloatField(default=0)
     Carbon_footprint= models.FloatField(default=0)
+    Net_Carbon_Footprint=models.FloatField(default=0)
+    
+    # Add a new field to store JSON data for detailed values
+    _meta_data = models.TextField(blank=True, null=True, default='{}')
+    
+    @property
+    def meta_data(self):
+        """Get the meta data as a dictionary"""
+        if not self._meta_data:
+            return {}
+        try:
+            return json.loads(self._meta_data)
+        except Exception as e:
+            print(f"Error parsing meta_data JSON: {e}")
+            return {}
+    
+    @meta_data.setter
+    def meta_data(self, value):
+        """Save the meta data from a dictionary"""
+        try:
+            if value is None:
+                self._meta_data = '{}'
+            else:
+                self._meta_data = json.dumps(value)
+        except Exception as e:
+            print(f"Error saving meta_data: {e}")
+            self._meta_data = '{}'
     
     class Meta:
         verbose_name = "Carbon Emission"
