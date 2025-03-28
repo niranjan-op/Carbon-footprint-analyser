@@ -710,3 +710,57 @@ input[type="number"]:focus, input[type="text"]:focus {
 .header-with-back h1 {
     margin: 0;
 }
+
+/* Add these styles for the search bar */
+.search-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    font-size: 16px;
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #555;
+}
+
+.clear-search {
+    margin-left: 10px;
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.clear-search:hover {
+    background-color: #d32f2f;
+}
+
+.no-results {
+    text-align: center;
+    color: #666;
+    margin: 30px 0;
+    font-size: 18px;
+}

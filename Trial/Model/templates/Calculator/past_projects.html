@@ -34,6 +34,22 @@
             </a>
         </div>
         
+        <div class="search-container">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search by project name..." value="{{ search_query }}">
+                <button type="submit" class="search-button">Search</button>
+                {% if search_query %}
+                    <a href="{% url 'Model:past_projects' %}" class="clear-search">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if search_query and not projects %}
+        <div class="no-results">
+            <p>No projects found matching "{{ search_query }}"</p>
+        </div>
+        {% endif %}
+        
         {% if projects %}
             <div class="projects-list">
                 {% for project in projects %}
@@ -199,6 +215,57 @@
             .projects-list {
                 grid-template-columns: 1fr;
             }
+        }
+        
+        .search-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .search-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-form input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .search-button:hover {
+            background-color: #45a049;
+        }
+        
+        .clear-search {
+            padding: 8px 15px;
+            background-color: #F44336;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .clear-search:hover {
+            background-color: #e53935;
+        }
+        
+        .no-results {
+            text-align: center;
+            margin: 20px 0;
+            color: #555;
         }
     </style>
 </body>

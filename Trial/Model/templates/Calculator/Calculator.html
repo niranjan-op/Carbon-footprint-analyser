@@ -22,7 +22,7 @@
                 <li><span class="username">Welcome, {{ user.username }}</span></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}
-                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
             {% endif %}
         </ul>
     </nav>
@@ -71,11 +71,13 @@
             <div class="form-group">
                 <label for="project_name">Project Name</label>
                 <input type="text" id="project_name" name="project_name" value="{{ past_emission.project_name }}" required>
+                <div id="project_name_error" class="error-message" style="display: none; color: red; margin-top: 5px;"></div>
             </div>
             {% else %}
             <div class="form-group">
                 <label for="project_name">Project Name</label>
                 <input type="text" id="project_name" name="project_name" placeholder="Enter a name for this project" required>
+                <div id="project_name_error" class="error-message" style="display: none; color: red; margin-top: 5px;"></div>
             </div>
             {% endif %}
             
@@ -221,5 +223,65 @@
         </form>
     </div>
     <script src="{% static 'js/calculator.js' %}"></script>
+    <script>
+        // Store existing project names for validation
+        const existingProjectNames = [
+            {% for name in existing_project_names %}
+                "{{ name }}",
+            {% endfor %}
+        ];
+        
+        // Store original project name if editing
+        {% if past_emission %}
+        const originalProjectName = "{{ past_emission.project_name }}";
+        {% else %}
+        const originalProjectName = "";
+        {% endif %}
+        
+        // Project name validation function
+        function validateProjectName() {
+            const projectNameInput = document.getElementById('project_name');
+            const errorElement = document.getElementById('project_name_error');
+            const submitButton = document.querySelector('.submit-button');
+            const enteredName = projectNameInput.value.trim();
+            
+            // Reset validation state
+            errorElement.style.display = 'none';
+            projectNameInput.style.borderColor = '';
+            submitButton.disabled = false;
+            
+            // If editing and name hasn't changed, it's valid
+            if (enteredName === originalProjectName) {
+                return true;
+            }
+            
+            // Check if name exists in our list
+            if (existingProjectNames.includes(enteredName)) {
+                errorElement.textContent = 'This project name already exists. Please choose a different name.';
+                errorElement.style.display = 'block';
+                projectNameInput.style.borderColor = '#dc3545';
+                submitButton.disabled = true;
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectNameInput = document.getElementById('project_name');
+            const form = document.querySelector('.carbon-footprint-form');
+            
+            // Check on input
+            projectNameInput.addEventListener('input', validateProjectName);
+            
+            // Validate before form submission
+            form.addEventListener('submit', function(event) {
+                if (!validateProjectName()) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -22,6 +22,7 @@
             {% if error %}
                 <div class="message error">{{ error }}</div>
             {% endif %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>

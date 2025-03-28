@@ -48,6 +48,11 @@ def Calculator(request):
         Transport.objects.create(constants=constants, transport_type="Dumper (20 tonne)", emission_factor=0.11)
         Transport.objects.create(constants=constants, transport_type="Truck (40 tonne)", emission_factor=0.16)
     
+    # Get list of existing project names for validation
+    existing_project_names = []
+    if request.user.is_authenticated:
+        existing_project_names = list(CarbonEmission.objects.filter(user=request.user).values_list('project_name', flat=True))
+    
     # Initialize form with past project data if available
     initial_data = {}
     if past_emission:
@@ -126,157 +131,55 @@ def Calculator(request):
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
         if form.is_valid():
+            # Get the submitted project name
+            submitted_project_name = request.POST.get('project_name', '')
+            
             # Check if we're updating an existing project or creating a new one
             if past_emission:
                 # Update existing emission object
                 emission = past_emission
+                
+                # Verify project name uniqueness (only if name has changed)
+                if submitted_project_name != past_emission.project_name and submitted_project_name in existing_project_names:
+                    messages.error(request, f"Project name '{submitted_project_name}' already exists. Please choose a different name.")
+                    context = {
+                        'form': form,
+                        'constants': constants,
+                        'explosives': explosives,
+                        'transports': transports,
+                        'past_emission': past_emission,
+                        'explosive_data': explosive_data,
+                        'transport_data': transport_data,
+                        'existing_project_names': existing_project_names,
+                    }
+                    return render(request, 'Calculator/Calculator.html', context)
                 
                 # Update fields from the form
                 for field in form.cleaned_data:
                     if field != 'mine_type':  # Skip mine_type as it's not in the model
                         setattr(emission, field, form.cleaned_data[field])
             else:
+                # Check if project name already exists for this user
+                if request.user.is_authenticated and submitted_project_name in existing_project_names:
+                    messages.error(request, f"Project name '{submitted_project_name}' already exists. Please choose a different name.")
+                    context = {
+                        'form': form,
+                        'constants': constants,
+                        'explosives': explosives,
+                        'transports': transports,
+                        'past_emission': past_emission,
+                        'explosive_data': explosive_data,
+                        'transport_data': transport_data,
+                        'existing_project_names': existing_project_names,
+                    }
+                    return render(request, 'Calculator/Calculator.html', context)
+                
                 # Create a new emission object
                 emission = form.save(commit=False)
                 
                 # Set project name if not editing
-                if 'project_name' in request.POST and request.POST['project_name']:
-                    emission.project_name = request.POST['project_name']
-            
-            # Common processing for both new and existing emissions
-            if request.user.is_authenticated:
-                emission.user = request.user
-                
-            emission.constants = constants
-            
-            # Get mine type from the form data but don't save it to the model
-            mine_type = request.POST.get('mine_type', 'open_cast')
-            
-            # Process custom explosive values
-            total_explosive_emissions = 0
-            total_explosives_used = 0
-            explosive_details = {}
-            
-            for explosive in explosives:
-                amount_field_name = f'explosive_{explosive.id}_amount'
-                if amount_field_name in request.POST and request.POST[amount_field_name]:
-                    amount = float(request.POST[amount_field_name])
-                    total_explosives_used += amount
-                    explosive_details[str(explosive.id)] = amount
-                    # Calculate emissions: amount * emission_factor
-                    total_explosive_emissions += amount * explosive.emission_factor
-            
-            # Save total explosives used
-            emission.explosives_used = total_explosives_used
-            emission.explosive_emissions = total_explosive_emissions
-            
-            # Process custom transport values
-            total_transport_emissions = 0
-            total_transport_distance = 0
-            transport_details = {}
-            
-            for transport in transports:
-                distance_field_name = f'transport_{transport.id}_distance'
-                if distance_field_name in request.POST and request.POST[distance_field_name]:
-                    distance = float(request.POST[distance_field_name])
-                    total_transport_distance += distance
-                    transport_details[str(transport.id)] = distance
-                    # Calculate emissions: distance * emission_factor
-                    total_transport_emissions += distance * transport.emission_factor
-            
-            # Save total transport distance
-            emission.transport_distance = total_transport_distance
-            emission.transport_emissions = total_transport_emissions
-
-            # Process project name from the form
-            if 'project_name' in request.POST and request.POST['project_name']:
-                emission.project_name = request.POST['project_name']
-            
-            carbon_prod = [emission.anthracite, emission.bituminous_coking, emission.bituminous_non_coking, 
-                           emission.subbituminous, emission.lignite]
-            
-            # Check if all inputs are zero - should result in zero carbon footprint
-            all_zeros = all(value == 0 for value in [
-                emission.anthracite, emission.bituminous_coking, emission.bituminous_non_coking,
-                emission.subbituminous, emission.lignite, emission.diesel_used, emission.petrol_used,
-                emission.electricity_used, emission.overburden_removed, emission.land_disturbance,
-                emission.total_ch4, emission.waste, total_explosives_used, total_transport_distance
-            ])
-            
-            if all_zeros:
-                # If all inputs are zero, carbon footprint should be zero
-                Carbon_footprint = 0
-                print("All inputs are zero, setting Carbon_footprint to zero")
-            else:
-                # Only calculate if we have non-zero inputs
-                coal_type_conv = [constants.anthracite_cf, constants.bituminous_c_cf, constants.bituminous_nc_cf, 
-                                constants.subbituminous_cf, constants.lignite_cf]
-                carbon_content = [constants.anthracite_cc, constants.bituminous_c_cc, constants.bituminous_nc_cc, 
-                                constants.subbituminous_cc, constants.lignite_cc]
-                cof = [constants.anthracite_cof, constants.bituminous_c_cof, constants.bituminous_nc_cof, 
-                    constants.subbituminous_cof, constants.lignite_cof]
-
-                # Debug print to see what's being passed to the calculation
-                print("Carbon production inputs:", carbon_prod)
-                
-                Carbon_footprint = Carbon_Production(constants.exclusion_fact, carbon_prod, carbon_content, coal_type_conv, cof)
-                print("Initial Carbon_footprint after Carbon_Production:", Carbon_footprint)
-
-                if mine_type == 'open_cast':
-                    Carbon_footprint += np.multiply(emission.overburden_removed, constants.overburden_ef)
-                    print("After overburden:", Carbon_footprint)
-                    Carbon_footprint += np.multiply(emission.land_disturbance, constants.csl)
-                    print("After land disturbance:", Carbon_footprint)
-                elif mine_type == 'underground':
-                    Carbon_footprint += np.multiply(np.multiply(emission.total_ch4, 0.00067), 25)
-                    print("After methane:", Carbon_footprint)
-
-                # Equipment and Fuel Emissions:
-                Carbon_footprint += FuelEmissions(constants.diesel_ef, emission.diesel_used)
-                print("After diesel:", Carbon_footprint)
-                Carbon_footprint += FuelEmissions(constants.petrol_ef, emission.petrol_used)
-                print("After petrol:", Carbon_footprint)
-
-                # Electricity Emissions:
-                Carbon_footprint += ElecEmissions(emission.electricity_used, constants.grid_emission_factor)
-                print("After electricity:", Carbon_footprint)
-
-                # Waste:
-                Carbon_footprint += WasteEmissions(emission.waste, constants.waste_ef)
-                print("After waste:", Carbon_footprint)
-                Carbon_footprint += total_explosive_emissions + total_transport_emissions
-                print("Final Carbon_footprint:", Carbon_footprint)
-
-            # Calculate and save the net carbon footprint
-            sequestration_amount = Sequesteration(emission.sequestration, constants.carbon_sequesteration_rate)
-            Net_Carbon_Footprint = Carbon_footprint - sequestration_amount
-            emission.Net_Carbon_Footprint = Net_Carbon_Footprint
-            emission.Carbon_footprint = Carbon_footprint
-
-            # Save the emission record if user is authenticated
-            if request.user.is_authenticated:
-                emission.save()  # Save first to get an ID
-                
-                # Store in meta_data
-                meta_data = emission.meta_data or {}
-                meta_data['explosive_amounts'] = explosive_details
-                meta_data['transport_distances'] = transport_details
-                emission.meta_data = meta_data
-                emission.save()  # Save again with meta_data
-                
-                # Also store in session as backup
-                request.session[f'explosive_details_{emission.project_name}'] = explosive_details
-                request.session[f'transport_details_{emission.project_name}'] = transport_details
-                
-                messages.success(request, "Calculation completed successfully.")
-                return redirect('Model:Results', project_name=emission.project_name)
-            else:
-                # For anonymous users, just show results without saving
-                return render(request, 'Calculator/Results.html', {'emission': emission})
-        else:
-            # Debug: print form errors to the terminal
-            print("Form errors:", form.errors)
-            messages.error(request, "There was an error saving the form. Please check your input.")    
+                if submitted_project_name:
+                    emission.project_name = submitted_project_name
     
     context = {
         'form': form,
@@ -286,6 +189,7 @@ def Calculator(request):
         'past_emission': past_emission,
         'explosive_data': explosive_data,
         'transport_data': transport_data,
+        'existing_project_names': existing_project_names,
     }
         
     return render(request, 'Calculator/Calculator.html', context)
@@ -435,8 +339,15 @@ def Results(request, project_name):
 
 @login_required
 def past_projects(request):
+    # Get search query from GET parameters
+    search_query = request.GET.get('search', '')
+    
     # Get CarbonEmission objects for the current user
     projects = CarbonEmission.objects.filter(user=request.user)
+    
+    # Apply search filter if a search query exists
+    if search_query:
+        projects = projects.filter(project_name__icontains=search_query)
     
     # For each project, prepare explosives and transport data to display
     for project in projects:
@@ -447,7 +358,10 @@ def past_projects(request):
         project.explosives_data = constants.explosives.all()
         project.transports_data = constants.transports.all()
     
-    return render(request, 'Calculator/past_projects.html', {'projects': projects})
+    return render(request, 'Calculator/past_projects.html', {
+        'projects': projects,
+        'search_query': search_query
+    })
 
 @login_required
 def delete_project(request, project_name):
