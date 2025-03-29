@@ -2,23 +2,25 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from .forms import Configure_Constants_Input, ExplosiveForm, TransportForm, CalculatorForm
 from .models import Constants, Explosive, Transport, CarbonEmission
 from .Calculation import *
+from .validators import validate_financial_year
 import numpy as np
 
 def Calculator(request):
-    # Check if there's a project_name in the request to load past project data
-    project_name = request.GET.get('project_name')
+    # Check if there's a financial_year in the request to load past project data
+    financial_year = request.GET.get('financial_year')
     past_emission = None
     
-    if project_name:
-        # Load the past emission data for editing/viewing - filter by both project_name and user
+    if financial_year:
+        # Load the past emission data for editing/viewing - filter by both financial_year and user
         if request.user.is_authenticated:
-            past_emission = get_object_or_404(CarbonEmission, project_name=project_name, user=request.user)
+            past_emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
         else:
             # For anonymous users
-            past_emission = get_object_or_404(CarbonEmission, project_name=project_name, user=None)
+            past_emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=None)
             
         # Check if the user owns this emission data (redundant but kept for safety)
         if request.user.is_authenticated and past_emission.user != request.user:
@@ -75,9 +77,20 @@ def Calculator(request):
     explosive_data = {}
     transport_data = {}
     
+    # Define context here so it's available throughout the function
+    context = {
+        'form': form,
+        'constants': constants,
+        'explosives': explosives,
+        'transports': transports,
+        'past_emission': past_emission,
+        'explosive_data': explosive_data,
+        'transport_data': transport_data,
+    }
+    
     if past_emission:
         # Debug: Print what's in the emission
-        print(f"Loading data for emission: {past_emission.project_name}")
+        print(f"Loading data for emission: {past_emission.financial_year}")
         
         try:
             # Check if meta_data attribute exists and has the required data
@@ -101,7 +114,7 @@ def Calculator(request):
             
         # Fall back to session if meta_data didn't provide the values
         if not explosive_data:
-            session_explosives = request.session.get(f'explosive_details_{past_emission.project_name}', {})
+            session_explosives = request.session.get(f'explosive_details_{past_emission.financial_year}', {})
             if session_explosives:
                 print(f"Using explosive data from session: {session_explosives}")
                 explosive_data = session_explosives
@@ -112,7 +125,7 @@ def Calculator(request):
                     explosive_data[str(explosive.id)] = amount_per_explosive
             
         if not transport_data:
-            session_transports = request.session.get(f'transport_details_{past_emission.project_name}', {})
+            session_transports = request.session.get(f'transport_details_{past_emission.financial_year}', {})
             if session_transports:
                 print(f"Using transport data from session: {session_transports}")
                 transport_data = session_transports
@@ -126,6 +139,16 @@ def Calculator(request):
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
         if form.is_valid():
+            # Validate financial_year explicitly
+            financial_year = request.POST.get('financial_year')
+            try:
+                validate_financial_year(financial_year)
+            except ValidationError as e:
+                messages.error(request, f"Invalid financial year: {e}")
+                # Update the form in context before returning
+                context['form'] = form
+                return render(request, 'Calculator/Calculator.html', context)
+            
             # Check if we're updating an existing project or creating a new one
             if past_emission:
                 # Update existing emission object
@@ -139,9 +162,9 @@ def Calculator(request):
                 # Create a new emission object
                 emission = form.save(commit=False)
                 
-                # Set project name if not editing
-                if 'project_name' in request.POST and request.POST['project_name']:
-                    emission.project_name = request.POST['project_name']
+                # Set financial_year if not editing
+                if financial_year:
+                    emission.financial_year = financial_year
             
             # Common processing for both new and existing emissions
             if request.user.is_authenticated:
@@ -189,8 +212,8 @@ def Calculator(request):
             emission.transport_emissions = total_transport_emissions
 
             # Process project name from the form
-            if 'project_name' in request.POST and request.POST['project_name']:
-                emission.project_name = request.POST['project_name']
+            if 'financial_year' in request.POST and request.POST['financial_year']:
+                emission.financial_year = request.POST['financial_year']
             
             carbon_prod = [emission.anthracite, emission.bituminous_coking, emission.bituminous_non_coking, 
                            emission.subbituminous, emission.lignite]
@@ -265,28 +288,23 @@ def Calculator(request):
                 emission.save()  # Save again with meta_data
                 
                 # Also store in session as backup
-                request.session[f'explosive_details_{emission.project_name}'] = explosive_details
-                request.session[f'transport_details_{emission.project_name}'] = transport_details
+                request.session[f'explosive_details_{emission.financial_year}'] = explosive_details
+                request.session[f'transport_details_{emission.financial_year}'] = transport_details
                 
                 messages.success(request, "Calculation completed successfully.")
-                return redirect('Model:Results', project_name=emission.project_name)
+                return redirect('Model:Results', financial_year=emission.financial_year)
             else:
                 # For anonymous users, just show results without saving
                 return render(request, 'Calculator/Results.html', {'emission': emission})
         else:
             # Debug: print form errors to the terminal
             print("Form errors:", form.errors)
-            messages.error(request, "There was an error saving the form. Please check your input.")    
+            messages.error(request, "There was an error saving the form. Please check your input.")
+            # Update form in context with the invalid form
+            context['form'] = form
     
-    context = {
-        'form': form,
-        'constants': constants,
-        'explosives': explosives,
-        'transports': transports,
-        'past_emission': past_emission,
-        'explosive_data': explosive_data,
-        'transport_data': transport_data,
-    }
+    # Update context with the latest form (important for POST failures)
+    context['form'] = form
         
     return render(request, 'Calculator/Calculator.html', context)
 
@@ -397,8 +415,8 @@ def Configure_Constants(request):
             
             # If coming from a specific emission page, redirect back there
             if emission_id:
-                # Update to use project_name instead of emission_id
-                return redirect('Model:Results', project_name=emission_id)
+                # Update to use financial_year instead of emission_id
+                return redirect('Model:Results', financial_year=emission_id)
             else:
                 return redirect('Model:Calculator')
         else:
@@ -423,14 +441,14 @@ def Configure_Constants(request):
         'emission_id': emission_id,  # Pass the emission_id to the template
     })
 
-def Results(request, project_name):
-    # Find emission by both project_name and user to avoid getting multiple results
+def Results(request, financial_year):
+    # Find emission by both financial_year and user to avoid getting multiple results
     if request.user.is_authenticated:
-        emission = get_object_or_404(CarbonEmission, project_name=project_name, user=request.user)
+        emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
     else:
-        # For anonymous users, just try to get by project_name
-        # Note: This might still cause issues if multiple anonymous users create projects with same name
-        emission = get_object_or_404(CarbonEmission, project_name=project_name, user=None)
+        # For anonymous users, just try to get by financial_year
+        # Note: This might still cause issues if multiple anonymous users create projects with same year
+        emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=None)
     return render(request, 'Calculator/Results.html', {'emission': emission})
 
 @login_required
@@ -443,7 +461,7 @@ def past_projects(request):
     
     # Apply search filter if a search query exists
     if search_query:
-        projects = projects.filter(project_name__icontains=search_query)
+        projects = projects.filter(financial_year__icontains=search_query)
     
     # For each project, prepare explosives and transport data to display
     for project in projects:
@@ -460,29 +478,29 @@ def past_projects(request):
     })
 
 @login_required
-def delete_project(request, project_name):
+def delete_project(request, financial_year):
     """Delete a user's project"""
-    # Get project by both name and user to ensure we're deleting the right one
-    emission = get_object_or_404(CarbonEmission, project_name=project_name, user=request.user)
+    # Get project by both financial_year and user to ensure we're deleting the right one
+    emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
     
     # Check if the user owns this emission data
     if emission.user != request.user:
         messages.error(request, "You don't have permission to delete this project.")
         return redirect('Model:past_projects')
         
-    # Store project name to confirm deletion in message
-    project_name = emission.project_name
+    # Store financial_year to confirm deletion in message
+    financial_year_value = emission.financial_year
     
     # Delete the emission
     emission.delete()
     
     # Also clear any session data related to this emission
-    if f'explosive_details_{project_name}' in request.session:
-        del request.session[f'explosive_details_{project_name}']
+    if f'explosive_details_{financial_year_value}' in request.session:
+        del request.session[f'explosive_details_{financial_year_value}']
     
-    if f'transport_details_{project_name}' in request.session:
-        del request.session[f'transport_details_{project_name}']
+    if f'transport_details_{financial_year_value}' in request.session:
+        del request.session[f'transport_details_{financial_year_value}']
     
-    messages.success(request, f"Project '{project_name}' has been deleted successfully.")
+    messages.success(request, f"Project '{financial_year_value}' has been deleted successfully.")
     
     return redirect('Model:past_projects')

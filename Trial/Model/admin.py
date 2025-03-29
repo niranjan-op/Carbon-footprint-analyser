@@ -18,14 +18,14 @@ class ConstantsAdmin(admin.ModelAdmin):
 
 @admin.register(CarbonEmission)
 class CarbonEmissionAdmin(admin.ModelAdmin):
-    list_display = ('project_name', 'user', 'calculation_date', 'Carbon_footprint')
+    list_display = ('financial_year', 'user', 'calculation_date', 'Carbon_footprint')
     list_filter = ('user', 'calculation_date')
-    search_fields = ('project_name', 'user__username')
+    search_fields = ('financial_year', 'user__username')
     readonly_fields = ('calculation_date', 'Carbon_footprint')
     
     fieldsets = (
         ('Project Information', {
-            'fields': ('project_name', 'user', 'constants', 'calculation_date')
+            'fields': ('financial_year', 'user', 'constants', 'calculation_date')
         }),
         ('Coal Production', {
             'fields': ('anthracite', 'bituminous_coking', 'bituminous_non_coking', 'subbituminous', 'lignite')

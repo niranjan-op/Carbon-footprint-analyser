@@ -12,7 +12,7 @@
     <nav>
         <ul class="nav-left">
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">About Us</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
             <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
         </ul>
@@ -233,11 +233,11 @@
                 <span class="button-text">Back</span>
             </a>
             <a href="{% url 'Model:Calculator' %}" class="button">New Calculation</a>
-            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.project_name }}" class="config-button">
+            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.financial_year }}" class="config-button">
                 <span class="button-text">Configure Constants</span>
                 <span class="button-icon">⚙️</span>
             </a>
-            <a href="{% url 'Model:Calculator' %}?project_name={{emission.project_name}}" class="button edit-button">View/Edit Input Values</a>
+            <a href="{% url 'Model:Calculator' %}?financial_year={{emission.financial_year}}" class="button edit-button">View/Edit Input Values</a>
             <button class="button print-button" onclick="window.print()">Print Results</button>
         </div>
     </div>

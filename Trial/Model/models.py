@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import json
+from .validators import validate_financial_year
 
 class Constants(models.Model):
     """Model to store configuration constants for carbon footprint calculations"""
@@ -95,7 +96,7 @@ class CarbonEmission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     constants = models.ForeignKey(Constants, on_delete=models.SET_NULL, null=True)
     calculation_date = models.DateTimeField(auto_now_add=True)
-    project_name = models.CharField(max_length=200, default="Unnamed Project", primary_key=True,null=False)
+    financial_year = models.CharField(max_length=9,default=0, primary_key=True,null=False,validators=[validate_financial_year], help_text="YYYY-YYYY format")
     
     # Coal production values
     anthracite = models.FloatField(default=0, help_text="Anthracite production in tonnes")
@@ -176,5 +177,5 @@ class CarbonEmission(models.Model):
     
     def __str__(self):
         if self.user:
-            return f"{self.project_name} - {self.user.username} ({self.calculation_date.strftime('%Y-%m-%d')})"
-        return f"Hello{self.project_name} - {self.calculation_date.strftime('%Y-%m-%d')}"
+            return f"{self.financial_year} - {self.user.username} ({self.calculation_date.strftime('%Y-%m-%d')})"
+        return f"{self.financial_year} - {self.calculation_date.strftime('%Y-%m-%d')}"

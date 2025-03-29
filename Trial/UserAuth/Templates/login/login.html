@@ -1,38 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login</title> 
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
-</head>
-<body>
+    <link rel="stylesheet" href="{% static 'styles/login_styles.css' %}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head> 
+<body class="login-bg"> 
     <nav>
         <ul>
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">About Us</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
         </ul>
     </nav>
-    <div class="content">
-        <h1>Login</h1>
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
-            {% if error %}
-                <div class="message error">{{ error }}</div>
-            {% endif %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+
+    <section>
+        <div class="login"> 
+            <div class="login-back-arrow">
+                <a href="javascript:history.back()"><i class="fas fa-arrow-left"></i></a>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+            
+            <div class="content"> 
+                <h2>Login</h2> 
+                <div class="form"> 
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {% if error %}
+                            <div class="error-message">{{ error }}</div>
+                        {% endif %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                        
+                        <div class="inputBox"> 
+                            <input type="text" name="username" id="username" required> 
+                            <i>Username</i> 
+                        </div> 
+
+                        <div class="inputBox"> 
+                            <input type="password" name="password" id="password" required> 
+                            <i>Password</i> 
+                        </div> 
+
+                        <div class="inputBox"> 
+                            <input type="submit" value="Login"> 
+                        </div>
+                    </form> 
+                </div> 
+            </div> 
+        </div> 
+    </section> 
 </body>
 </html>

@@ -6,7 +6,7 @@ app_name = 'Model'
 urlpatterns = [
     path('Calculator/', Calculator, name='Calculator'),
     path('past-projects/', past_projects, name='past_projects'),
-    path('Results/<str:project_name>/', Results, name='Results'),
+    path('Results/<str:financial_year>/', Results, name='Results'),
     path('Configure_Constants/', Configure_Constants, name='Configure_Constants'),
-    path('delete-project/<str:project_name>/', delete_project, name='delete_project'),
+    path('delete-project/<str:financial_year>/', delete_project, name='delete_project'),
 ]

@@ -6,12 +6,30 @@
     <title>My Website</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <script>
+        // Check if calculator state exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculatorState = sessionStorage.getItem('calculatorFormState');
+            const timestamp = sessionStorage.getItem('calculatorStateTimestamp');
+            
+            // Only show notification if state exists and is less than 30 minutes old
+            if (calculatorState && timestamp && (Date.now() - timestamp < 30 * 60 * 1000)) {
+                const notification = document.createElement('div');
+                notification.className = 'calculator-state-notification';
+                notification.innerHTML = `
+                    <p>You have unsaved calculator data. <a href="{% url 'Model:Calculator' %}">Return to Calculator</a></p>
+                    <button onclick="this.parentElement.style.display='none';">×</button>
+                `;
+                document.body.prepend(notification);
+            }
+        });
+    </script>
 </head>
 <body>
     <nav>
         <ul class="nav-left">
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">About Us</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
             <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
         </ul>

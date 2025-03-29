@@ -13,7 +13,7 @@
     <nav>
         <ul class="nav-left">
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">About Us</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
             <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
         </ul>
@@ -43,9 +43,9 @@
             <div class="edit-project-notice">
                 <div class="notice-icon">📝</div>
                 <div class="notice-content">
-                    <h3>Editing Project: {{ past_emission.project_name }}</h3>
+                    <h3>Editing Project: {{ past_emission.financial_year }}</h3>
                     <p>You are currently viewing/editing input values from your past project. Make changes and recalculate, or go back to results.</p>
-                    <a href="{% url 'Model:Results' past_emission.project_name %}" class="config-button">
+                    <a href="{% url 'Model:Results' past_emission.financial_year %}" class="config-button">
                         <span class="button-text">Back to Results</span>
                         <span class="button-icon">→</span>
                     </a>
@@ -69,13 +69,15 @@
             <!-- Add a project name field if editing a past project -->
             {% if past_emission %}
             <div class="form-group">
-                <label for="project_name">Project Name</label>
-                <input type="text" id="project_name" name="project_name" value="{{ past_emission.project_name }}" required>
+                <label for="project_name">Financial year</label>
+                <input type="text" id="financial_year" name="financial_year" value="{{ past_emission.financial_year }}" pattern="20\d{2}-20\d{2}" title="Format: YYYY-YYYY where second year is one year after first (e.g. 2023-2024)" required>
+                <div class="input-hint">Format: 20YY-20YY (e.g., 2023-2024)</div>
             </div>
             {% else %}
             <div class="form-group">
-                <label for="project_name">Project Name</label>
-                <input type="text" id="project_name" name="project_name" placeholder="Enter a name for this project" required>
+                <label for="project_name">Financial year</label>
+                <input type="text" id="financial_year" name="financial_year" placeholder="e.g., 2023-2024" pattern="20\d{2}-20\d{2}" title="Format: YYYY-YYYY where second year is one year after first (e.g. 2023-2024)" required>
+                <div class="input-hint">Format: YYYY-YYYY where second year is one year after first</div>
             </div>
             {% endif %}
             
@@ -212,12 +214,16 @@
 
 
             
+            {% if past_emission %}
             <div class="form-actions" action="POST">
                 <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
-                {% if past_emission %}
-                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.project_name %}'">Cancel</button>
-                {% endif %}
+                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.financial_year %}'">Cancel</button>
             </div>
+            {% else %}
+            <div class="form-actions" action="POST">
+                <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
+            </div>
+            {% endif %}
         </form>
     </div>
     <script src="{% static 'js/calculator.js' %}"></script>
