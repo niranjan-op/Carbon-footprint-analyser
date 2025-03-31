@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configure Constants</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Configure_Constants_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="hamburger-menu">
+            <button class="hamburger-btn" onclick="toggleNavMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="nav-container" id="navMenu">
+            <ul class="nav-left">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'about_us' %}">About Us</a></li>
+                <li><a href="{% url 'Model:Calculator' %}">Calculator</a></li>
+            </ul>
+            <ul class="nav-right">
+                {% if user.is_authenticated %}
+                    <li><span class="username">Welcome, {{ user.username }}</span></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <form class="carbon-footprint-form" method="POST">
+            {% csrf_token %}
+            {% if emission_id %}
+                <input type="hidden" name="emission_id" value="{{ emission_id }}">
+            {% endif %}
+            <h1>Configure Constants</h1>
+            
+            <h2>1. Coal</h2>
+            <div class="form-group">
+                <h3>i) Type of coal mine</h3>
+                <div class="radio-group">
+                    {% for radio in form.mine_type %}
+                        <div class="radio-item">
+                            {{ radio.tag }}
+                            <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3>ii) Coal Type Conversion Factor for different types of coals</h3>
+                <div class="Coal-Type-Conversion">
+                    <div class="anthracite-cf">
+                        <label for="anthracite_cf">Anthracite</label>
+                        {{ form.anthracite_cf }}
+                    </div>
+                    <div class="bituminous_c-cf">
+                        <label for="bituminous_c_cf">Bituminous (Coking)</label>
+                        {{ form.bituminous_c_cf }}
+                    </div>
+                    <div class="bituminous_nc-cf">
+                        <label for="bituminous_nc_cf">Bituminous (Non-Coking)</label>
+                        {{ form.bituminous_nc_cf }}
+                    </div>
+                    <div class="subbituminous-cf">
+                        <label for="subbituminous_cf">Subbituminous</label>
+                        {{ form.subbituminous_cf }}
+                    </div>
+                    <div class="lignite-cf">
+                        <label for="lignite_cf">Lignite</label>
+                        {{ form.lignite_cf }}
+                    </div>
+                    <div class="conversion-fact">
+                        <label for="conv_fact">Conversion Factor (add exact value)</label>
+                        {{ form.conv_fact }}
+                    </div>
+                    <div class="exclusion-fact">
+                        <label for="exclusion_fact">Exclusion Factor (add exact value)</label>
+                        {{ form.exclusion_fact }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3>iii) Effective CO<sub>2</sub> Emissions factor</h3>
+                <h4>a) Carbon Content (CC) (Enter Carbon per mass unit energy in kg/GJ)</h4>
+                <div class="Carbon-Content">
+                    <div class="anthracite-cc">
+                        <label for="anthracite_cc">Anthracite</label>
+                        {{ form.anthracite_cc }}
+                    </div>
+                    <div class="bituminous_c-cc">
+                        <label for="bituminous_c_cc">Bituminous (Coking)</label>
+                        {{ form.bituminous_c_cc }}
+                    </div>
+                    <div class="lignite-cc">
+                        <label for="lignite_cc">Bituminous (Non-Coking)</label>
+                        {{ form.lignite_cc }}
+                    </div>
+                    <div class="bituminous_nc-cc">
+                        <label for="bituminous_nc_cc">Subbituminous</label>
+                        {{ form.bituminous_nc_cc }}
+                    </div>
+                    <div class="subbituminous-cc">
+                        <label for="subbituminous_cc">Lignite</label>
+                        {{ form.subbituminous_cc }}
+                    </div>
+                </div>
+                
+                <h4>b) Carbon Oxidation Factor (COF)</h4>
+                <div class="COF">
+                    <div class="anthracite-cof">
+                        <label for="anthracite_cof">Anthracite</label>
+                        {{ form.anthracite_cof }}
+                    </div>
+                    <div class="bituminous_c-cof">
+                        <label for="bituminous_c_cof">Bituminous (Coking)</label>
+                        {{ form.bituminous_c_cof }}
+                    </div>
+                    <div class="bituminous_nc-cof">
+                        <label for="bituminous_nc_cof">Bituminous (Non-Coking)</label>
+                        {{ form.bituminous_nc_cof }}
+                    </div>
+                    <div class="subbituminous-cof">
+                        <label for="subbituminous_cof">Subbituminous</label>
+                        {{ form.subbituminous_cof }}
+                    </div>
+                    <div class="lignite-cof">
+                        <label for="lignite_cof">Lignite</label>
+                        {{ form.lignite_cof }}
+                    </div>
+                </div>
+                
+                <div id="carbon-stock-methane" style="display: none;">
+                    <h3>iv) Carbon Stock Loss - Methane Emission Factor</h3>
+                    <div class="sub-fields">
+                        <div class="sub-field-pair anthracite-ch4">
+                            <label for="anthracite_ch4">Anthracite</label>
+                            {{ form.anthracite_ch4 }}
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="bituminous_c_ch4">Bituminous (Coking)</label>
+                            {{ form.bituminous_c_ch4 }}
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="bituminous_nc_ch4">Bituminous (Non-Coking)</label>
+                            {{ form.bituminous_nc_ch4 }}
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="subbituminous_ch4">Subbituminous</label>
+                            {{ form.subbituminous_ch4 }}
+                        </div>
+                        <div class="sub-field-pair">
+                            <label for="lignite_ch4">Lignite</label>
+                            {{ form.lignite_ch4 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>2. Emission by equipments</h2>
+                <h4>i) Diesel Powered Machinery (Enter average emission per litre)</h4>
+                <div class="emission-equip">
+                    <div class="diesel-ef">
+                        <label for="diesel_ef">Emission Factor (kg CO₂/litre)</label>
+                        {{ form.diesel_ef }}
+                    </div>
+                </div>
+                
+                <h4>ii) Petrol Powered Machinery (Enter average emission per litre)</h4>
+                <div class="sub-fields">
+                    <div class="petrol-ef">
+                        <label for="petrol_ef">Emission Factor (kg CO₂/litre)</label>
+                        {{ form.petrol_ef }}
+                    </div>
+                </div>
+
+                <h4>iii) Explosives</h4>
+                <div class="explosives">
+                    <div class="explosive-ef">
+                        <label>Configure explosives and their emission factors</label>
+                        <button type="button" class="add-explosive-btn" onclick="addExplosiveField()">
+                            <i class="fas fa-plus"></i> Add Explosive
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Add a hidden input to track explosives count -->
+                <input type="hidden" id="explosives-count" name="explosives_count" value="0">
+                
+                <div id="explosives-container">
+                    {% for id, explosive_form in explosive_forms %}
+                        <div class="sub-fields explosive-fields">
+                            <h5>Explosive #{{ id }}</h5>
+                            <div class="sub-field-pair">
+                                <label for="explosive-type-{{ id }}">Type of Explosive</label>
+                                {{ explosive_form.explosive_type }}
+                            </div>
+                            <div class="sub-field-pair">
+                                <label for="explosive-emission-{{ id }}">Emission Factor (kg CO₂/kg)</label>
+                                {{ explosive_form.emission_factor }}
+                            </div>
+                            <div class="add-button-container">
+                                <button type="button" class="remove-btn" onclick="removeExplosiveField(this)" title="Remove this explosive">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>3. Electricity</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="grid-emission-factor">Grid Emission Factor (kg CO₂/kWh)</label>
+                        {{ form.grid_emission_factor }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>4. Transportation</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label>Configure transportation types and their emission factors</label>
+                        <button type="button" class="add-explosive-btn" onclick="addTransportField()">
+                            <i class="fas fa-plus"></i> Add Transport
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add a hidden input to track transport count -->
+                <input type="hidden" id="transport-count" name="transport_count" value="0">
+                
+                <div id="transportation-container">
+                    {% for id, transport_form in transport_forms %}
+                        <div class="sub-fields transportation-fields">
+                            <h4>Transport #{{ id }}</h4>
+                            <div class="sub-field-pair">
+                                <label for="transport-type-{{ id }}">Type of Transport</label>
+                                {{ transport_form.transport_type }}
+                            </div>
+                            <div class="sub-field-pair">
+                                <label for="transport-emission-{{ id }}">Emission Factor (kg CO₂/km)</label>
+                                {{ transport_form.emission_factor }}
+                            </div>
+                            <div class="add-button-container">
+                                <button type="button" class="remove-transport-btn" onclick="removeTransportField(this)" title="Remove this transport">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>5. Carbon Sequestration Potential</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="carbon_sequesteration_rate">Carbon Sequestration Rate (tCO₂/hectare/year)</label>
+                        {{ form.carbon_sequesteration_rate }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h2>6. Waste</h2>
+                <div class="sub-fields">
+                    <label for="waste_ef">Emission Factor for Waste (kgCO₂)</label>
+                    {{ form.waste_ef }}
+                </div>
+            </div>
+            
+            <!-- Open Cast specific fields -->
+            <div id="open-cast-fields" class="form-group" style="display: none;">
+                <h2>7. Overburdened Removal</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="overburden_ef">Average Overburden Emission Factor (kg/m<sup>3</sup>)</label>
+                        {{ form.overburden_ef }}
+                    </div>
+                </div>
+                <h2>8. Carbon Sequestration Rate</h2>
+                <div class="sub-fields">
+                    <div class="sub-field-single">
+                        <label for="csl">Carbon Stock Loss (tonnes CO<sub>2</sub>)</label>
+                        {{ form.csl }}
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="button">Save Constants</button>
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
+        </form>
+    </div>
+    
+    <script src="{% static 'js/configure_constants.js' %}"></script>
+</body>
+</html>

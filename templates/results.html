@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- ...existing code... -->
+</head>
+<body>
+    <!-- ...existing code... -->
+    <div id="piechart" style="width: 100%; height: 500px;"></div>
+    <script>
+        // Ensure `chartData` and `layout` are passed from the view as context variables
+        const chartData = {{ chart_data|safe }};
+        const layout = {{ chart_layout|safe }};
+        Plotly.newPlot('piechart', chartData, layout);
+    </script>
+    <!-- ...existing code... -->
+</body>
+</html>

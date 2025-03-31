@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Results</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Results_styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Keep Plotly.js since we still need it -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Add print-specific styles to ensure the chart displays well in print */
+        @media print {
+            /* Overall page settings */
+            @page {
+                size: portrait;
+                margin: 1cm;
+            }
+            
+            body {
+                font-size: 11pt;
+                color: black;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Container adjustments */
+            .container {
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Hide elements not needed in print */
+            nav, .action-buttons {
+                display: none !important;
+            }
+            
+            /* Chart container fix */
+            .chart-container {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 350px !important;
+                margin: 0 0 30px 0 !important;
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
+                overflow: hidden !important;
+                position: relative !important;
+                padding: 15px 0 !important; /* Reduced horizontal padding */
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+            
+            /* Pie chart specific fix */
+            #emissionsPieChart {
+                width: 100% !important;
+                height: 350px !important;
+                max-width: 100% !important;
+                display: block !important;
+                margin: 0 auto !important; /* Center horizontally */
+                position: relative !important;
+            }
+            
+            /* Results sections */
+            .results-section, .recommendation-card {
+                page-break-inside: avoid;
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                margin-bottom: 15px !important;
+            }
+            
+            /* Tables */
+            .results-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            
+            .results-table th, .results-table td {
+                padding: 8px !important;
+                font-size: 10pt !important;
+            }
+            
+            /* Summary cards */
+            .results-summary {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .summary-card {
+                flex: 1;
+                margin: 0 10px;
+                max-width: 45%;
+            }
+            
+            /* Fix for svg elements inside plotly */
+            svg {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Ensure page breaks at logical positions */
+            .detailed-results, .recommendations {
+                page-break-before: auto;
+            }
+            
+            .results-header {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% if not user.is_authenticated %}
+        {% include 'alerts/login_required_alert.html' %}
+        {% endif %}
+        
+        <div class="results-header">
+            <h1>Carbon Footprint Analysis Results</h1>
+            <p class="timestamp">Analysis performed on: {{ emission.calculation_date|date:"F d, Y H:i" }}</p>
+        </div>
+
+        <div class="results-summary">
+            <div class="summary-card total">
+                <h2>Total Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Carbon_footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e</span>
+                </div>
+            </div>
+            
+            <div class="summary-card per-tonne">
+                <h2>Net Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Net_Carbon_Footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e/tonne</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-charts">
+            <!-- Remove the Emissions Breakdown section -->
+            <div class="chart-container">
+                <h2>Emissions Distribution</h2>
+                <div id="emissionsPieChart" style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+
+        <div class="detailed-results">
+            <h2>Detailed Results</h2>
+            
+            <div class="results-section">
+                <h3>Coal Production Emissions</h3>
+                <table class="results-table">
+                    <tr>
+                        <th>Coal Type</th>
+                        <th>Amount (tonnes)</th>
+                    </tr>
+                    {% if emission.anthracite > 0 %}
+                    <tr>
+                        <td>Anthracite</td>
+                        <td>{{ emission.anthracite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Coking)</td>
+                        <td>{{ emission.bituminous_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_non_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Non-Coking)</td>
+                        <td>{{ emission.bituminous_non_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.subbituminous > 0 %}
+                    <tr>
+                        <td>Subbituminous</td>
+                        <td>{{ emission.subbituminous|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.lignite > 0 %}
+                    <tr>
+                        <td>Lignite</td>
+                        <td>{{ emission.lignite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            <div class="results-section">
+                <h3>Operational Emissions</h3>
+                <table class="results-table">
+                    {% if emission.diesel_used > 0 %}
+                    <tr>
+                        <td>Diesel Used</td>
+                        <td>{{ emission.diesel_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.diesel_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.petrol_used > 0 %}
+                    <tr>
+                        <td>Petrol Used</td>
+                        <td>{{ emission.petrol_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.petrol_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.electricity_used > 0 %}
+                    <tr>
+                        <td>Electricity Used</td>
+                        <td>{{ emission.electricity_used|floatformat:2 }} MWh</td>
+                        <td>{{ emission.electricity_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.explosive_emissions > 0 %}
+                    <tr>
+                        <td>Explosives</td>
+                        <td>Various</td>
+                        <td>{{ emission.explosive_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.transport_emissions > 0 %}
+                    <tr>
+                        <td>Transportation</td>
+                        <td>Various</td>
+                        <td>{{ emission.transport_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            {% if emission.overburden_removed > 0 or emission.land_disturbance > 0 %}
+            <div class="results-section">
+                <h3>Open Cast Mining Impacts</h3>
+                <table class="results-table">
+                    {% if emission.overburden_removed > 0 %}
+                    <tr>
+                        <td>Overburden Removed</td>
+                        <td>{{ emission.overburden_removed|floatformat:2 }} m³</td>
+                        <td>{{ emission.overburden_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.land_disturbance > 0 %}
+                    <tr>
+                        <td>Land Disturbance</td>
+                        <td>{{ emission.land_disturbance|floatformat:2 }} hectares</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.total_ch4 > 0 %}
+            <div class="results-section">
+                <h3>Underground Mining Impacts</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Methane Emissions</td>
+                        <td>{{ emission.total_ch4|floatformat:2 }} m³</td>
+                        <td>{{ emission.methane_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.waste > 0 %}
+            <div class="results-section">
+                <h3>Waste Management</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Waste Generated</td>
+                        <td>{{ emission.waste|floatformat:2 }} tonnes</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.sequestration > 0 %}
+            <div class="results-section positive-impact">
+                <h3>Carbon Sequestration</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Area Reforested</td>
+                        <td>{{ emission.sequestration|floatformat:2 }} hectares</td>
+                        <td>Carbon offset included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="recommendations">
+            <h2>Recommendations</h2>
+            <div class="recommendation-card">
+                <h3>Reduce Emissions</h3>
+                <ul>
+                    <li>Consider investing in more efficient equipment to reduce diesel and petrol consumption</li>
+                    <li>Explore renewable energy options to reduce reliance on grid electricity</li>
+                    <li>Optimize transportation routes and vehicles to minimize transport emissions</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h3>Offset Carbon Footprint</h3>
+                <ul>
+                    <li>Increase reforestation efforts in disturbed areas</li>
+                    <li>Invest in certified carbon offset projects</li>
+                    <li>Implement progressive rehabilitation practices</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}" class="button">New Calculation</a>
+            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.financial_year }}" class="config-button">
+                <span class="button-text">Configure Constants</span>
+                <span class="button-icon">⚙️</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}?financial_year={{emission.financial_year}}" class="button edit-button">View/Edit Input Values</a>
+            <button class="button print-button" onclick="window.print()">Print Results</button>
+        </div>
+    </div>
+
+    <!-- Hidden inputs to store emission values for JavaScript -->
+    <input type="hidden" id="coalEmissions" value="{{ emission.coal_emissions|default:0 }}">
+    <input type="hidden" id="dieselEmissions" value="{{ emission.diesel_emissions|default:0 }}">
+    <input type="hidden" id="petrolEmissions" value="{{ emission.petrol_emissions|default:0 }}">
+    <input type="hidden" id="explosiveEmissions" value="{{ emission.explosive_emissions|default:0 }}">
+    <input type="hidden" id="electricityEmissions" value="{{ emission.electricity_emissions|default:0 }}">
+    <input type="hidden" id="transportEmissions" value="{{ emission.transport_emissions|default:0 }}">
+    <input type="hidden" id="methaneEmissions" value="{{ emission.methane_emissions|default:0 }}">
+    <input type="hidden" id="overburdenEmissions" value="{{ emission.overburden_emissions|default:0 }}">
+    <input type="hidden" id="wasteEmissions" value="{{ emission.waste|default:0 }}">
+
+    <!-- Script remains the same but with improved print handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Parse the JSON data from the view
+                const pieChartData = {{ pie_chart_data|safe }};
+                
+                // Filter out zero values to make the chart more readable
+                const filteredLabels = [];
+                const filteredValues = [];
+                
+                for (let i = 0; i < pieChartData.values.length; i++) {
+                    if (pieChartData.values[i] > 0) {
+                        filteredLabels.push(pieChartData.labels[i]);
+                        filteredValues.push(pieChartData.values[i]);
+                    }
+                }
+                
+                // Create the pie chart only if we have data
+                if (filteredValues.length > 0) {
+                    const data = [{
+                        values: filteredValues,
+                        labels: filteredLabels,
+                        type: 'pie',
+                        textinfo: 'label+percent',
+                        textposition: 'inside',
+                        automargin: true,
+                        hoverinfo: 'label+percent+value',
+                        insidetextorientation: 'radial'
+                    }];
+                    
+                    const layout = {
+                        height: 400,
+                        width: Math.min(700, window.innerWidth * 0.9), // Responsive width
+                        margin: {"t": 20, "b": 70, "l": 30, "r": 30},
+                        showlegend: true,
+                        legend: {
+                            "orientation": "h", 
+                            y: -0.2,
+                            x: 0.5,
+                            xanchor: 'center',
+                            font: { size: 10 }
+                        },
+                        font: { size: 11 },
+                        autosize: true
+                    };
+                    
+                    // Improve responsive behavior for better printing
+                    const config = {
+                        responsive: true,
+                        displayModeBar: false,
+                        toImageButtonOptions: {
+                            format: 'png',
+                            filename: 'emissions_chart',
+                            height: 500,
+                            width: 700,
+                            scale: 2
+                        }
+                    };
+                    
+                    Plotly.newPlot('emissionsPieChart', data, layout, config);
+                    
+                    // Resize handler to ensure chart remains responsive
+                    window.addEventListener('resize', function() {
+                        Plotly.relayout('emissionsPieChart', {
+                            width: Math.min(700, window.innerWidth * 0.9)
+                        });
+                    });
+                    
+                    // Custom print handler
+                    document.querySelector('.print-button').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Optimize chart for printing
+                        Plotly.relayout('emissionsPieChart', {
+                            'width': window.innerWidth * 0.85,
+                            'height': 350,
+                            'margin': {"t": 15, "b": 80, "l": 15, "r": 15},
+                            'legend.y': -0.35,
+                            'legend.x': 0.5,
+                            'legend.orientation': 'h',
+                            'legend.font.size': 9
+                        });
+                        
+                        // Make sure the chart container is properly sized
+                        document.getElementById('emissionsPieChart').style.height = '350px';
+                        document.getElementById('emissionsPieChart').style.width = '95%';
+                        document.getElementById('emissionsPieChart').style.margin = '0 auto';
+                        
+                        // Wait for chart to render before printing
+                        setTimeout(function() {
+                            window.print();
+                            
+                            // Reset chart to original layout after print dialog is closed
+                            setTimeout(function() {
+                                Plotly.relayout('emissionsPieChart', layout);
+                            }, 1000);
+                        }, 500);
+                    });
+                    
+                    // Handle print events
+                    window.addEventListener('beforeprint', function() {
+                        optimizeChartForPrint();
+                    });
+                    
+                    function optimizeChartForPrint() {
+                        // Force redraw of the plot before printing with optimized settings
+                        Plotly.relayout('emissionsPieChart', {
+                            'width': window.innerWidth * 0.85,
+                            'height': 350,
+                            'margin': {"t": 15, "b": 80, "l": 15, "r": 15},
+                            'legend.y': -0.35,
+                            'legend.x': 0.5,
+                            'legend.xanchor': 'center',
+                            'legend.font.size': 9
+                        });
+                        
+                        // Make sure the chart container is properly sized
+                        document.getElementById('emissionsPieChart').style.height = '350px';
+                        document.getElementById('emissionsPieChart').style.width = '95%';
+                        document.getElementById('emissionsPieChart').style.margin = '0 auto';
+                    }
+                } else {
+                    document.getElementById('emissionsPieChart').innerHTML = 
+                        '<p class="no-data">No emission data available to display.</p>';
+                }
+            } catch (error) {
+                console.error("Error initializing pie chart:", error);
+                document.getElementById('emissionsPieChart').innerHTML = 
+                    '<p class="no-data">Error loading chart data.</p>';
+            }
+            
+            // Add a print button handler to ensure chart is fully rendered before printing
+            document.querySelector('.print-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Force redraw of the chart before printing
+                if (typeof Plotly !== 'undefined' && document.getElementById('emissionsPieChart')) {
+                    Plotly.relayout('emissionsPieChart', {
+                        'height': 450,
+                        'width': window.innerWidth * 0.9,
+                        'legend.y': -0.3
+                    });
+                }
+                
+                // Wait a bit for the chart to redraw before printing
+                setTimeout(function() {
+                    window.print();
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

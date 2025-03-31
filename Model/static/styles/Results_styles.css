@@ -1,0 +1,466 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    width: 85%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* Header & Navigation Styling */
+nav {
+    background: linear-gradient(to right, #1a1a1a, #333);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: nowrap;
+}
+
+nav ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+nav li {
+    display: inline;
+    margin: 0 15px;
+    padding: 0 8px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    transition: color 0.3s;
+    position: relative;
+}
+
+nav a:hover {
+    color: #4CAF50;
+}
+
+nav a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -3px;
+    left: 0;
+    background-color: #4CAF50;
+    transition: width 0.3s;
+}
+
+nav a:hover:after {
+    width: 100%;
+}
+
+.nav-left {
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.nav-right {
+    justify-content: flex-end;
+}
+
+.username {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Results Header */
+.results-header {
+    text-align: center;
+    margin: 40px 0;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #e9e9e9;
+}
+
+.results-header h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.timestamp {
+    color: #888;
+    font-style: italic;
+}
+
+/* Results Summary */
+.results-summary {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
+}
+
+.summary-card {
+    flex: 1;
+    max-width: 45%;
+    padding: 30px;
+    margin: 0 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.summary-card h2 {
+    margin-top: 0;
+    color: #444;
+    font-size: 1.5rem;
+}
+
+.summary-card.total {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.summary-card.per-tonne {
+    background-color: #2196F3;
+    color: white;
+}
+
+.result-value {
+    margin-top: 20px;
+}
+
+.result-value .number {
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: 1;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.result-value .unit {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* Charts Section */
+.results-charts {
+    margin: 50px 0;
+}
+
+.chart-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    height: 400px;
+}
+
+.chart-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Detailed Results */
+.detailed-results {
+    margin: 50px 0;
+}
+
+.detailed-results h2 {
+    color: #333;
+    border-bottom: 2px solid #e9e9e9;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.results-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.results-section h3 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.results-section.positive-impact h3 {
+    color: #1976D2;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.results-table th, .results-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.results-table th {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+
+.results-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Recommendations */
+.recommendations {
+    margin: 50px 0;
+}
+
+.recommendations h2 {
+    color: #333;
+    border-bottom: 2px solid #e9e9e9;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.recommendation-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.recommendation-card h3 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.recommendation-card ul {
+    padding-left: 20px;
+}
+
+.recommendation-card li {
+    margin-bottom: 10px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 50px 0 30px;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.button:hover {
+    background: #3d8b40;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.button.secondary {
+    background: #2196F3;
+}
+
+.button.secondary:hover {
+    background: #1976D2;
+}
+
+.button.print-button {
+    background: #757575;
+}
+
+.button.print-button:hover {
+    background: #616161;
+}
+
+/* Configure Constants Button Styling */
+.config-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: #3f51b5;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.config-button:hover {
+    background-color: #303f9f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.config-button .button-text {
+    margin-right: 8px;
+}
+
+.config-button .button-icon {
+    font-size: 18px;
+}
+
+/* Back Button Styling */
+.back-button {
+    background-color: #607D8B;
+    display: inline-flex;
+    align-items: center;
+}
+
+.back-button:hover {
+    background-color: #455A64;
+}
+
+.back-button .button-icon {
+    margin-right: 8px;
+}
+
+.header-with-back {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-with-back h1 {
+    margin: 0;
+}
+
+/* Print styles */
+@media print {
+    nav, .action-buttons {
+        display: none;
+    }
+    
+    .container {
+        width: 100%;
+        padding: 0;
+    }
+    
+    body {
+        background-color: white;
+    }
+    
+    .chart-container {
+        page-break-inside: avoid;
+    }
+    
+    .results-section {
+        box-shadow: none;
+        border: 1px solid #e9e9e9;
+        page-break-inside: avoid;
+    }
+    
+    .recommendation-card {
+        box-shadow: none;
+        border: 1px solid #e9e9e9;
+        page-break-inside: avoid;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    nav {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    nav li {
+        margin: 5px 0;
+    }
+    
+    .results-header h1 {
+        font-size: 2rem;
+    }
+    
+    .summary-card {
+        max-width: 100%;
+        margin: 0 0 20px;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .detailed-results h2, .recommendations h2 {
+        font-size: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* For smaller mobile screens */
+@media (max-width: 480px) {
+    .results-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .result-value .number {
+        font-size: 2.5rem;
+    }
+    
+    .results-table th, .results-table td {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .chart-container {
+        padding: 15px;
+        height: 250px;
+    }
+}

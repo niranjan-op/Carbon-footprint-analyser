@@ -1,0 +1,10 @@
+<div class="login-alert">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-content">
+        <h3>Login Required to Save Results</h3>
+        <p>Please log in to save your carbon footprint analysis results and track your progress over time.</p>
+        <div class="alert-buttons">
+            <a href="{% url 'login' %}?next={{ request.path }}" class="login-button">Log In</a>
+        </div>
+    </div>
+</div>
