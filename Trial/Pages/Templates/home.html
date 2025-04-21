@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineFootprint | Track your Carbon Footprint</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Removed inline style as it's now properly defined in home.css -->
+</head>
+<body>
+    <header class="header">
+        <div class="company-name">
+            <a href="index.html">MineFootprint</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>MineFootprint</h1>
+            <h2>Track Your Coal Mine's Carbon Footprint Now!</h2>
+            <a href="{% url 'Model:Calculator' %}" class="hero-cta-button">
+                <i class="fas fa-calculator"></i> Calculate Your Mine's Carbon Footprint
+            </a>
+        </div>
+    </section>
+
+    <div class="content">
+        <div class="intro-container">
+            <div class="intro-text-column">
+                <p>Coal has powered industries and economies for centuries, but its environmental cost is undeniable. Coal mining operations release massive amounts of greenhouse gases, including carbon dioxide (CO₂) and methane (CH₄), both of which trap heat and accelerate global warming.</p>
+                
+                <p>India, as the second-largest coal producer in the world, depends heavily on coal for energy. However, this comes with severe environmental consequences, including rising temperatures, extreme weather, deforestation, and air pollution.</p>
+            </div>
+            <div class="intro-image">
+                <img src="{% static 'images/Coal_Mine_Harmful.png' %}" alt="Harmful Effects of Coal Mining">
+                <p class="image-caption">Without accurate tracking and reduction of emissions, the negative impacts of coal mining will continue to escalate.</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title"><i class="fas fa-fire"></i> How Coal Mining Contributes to Global Warming</h2>
+        
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-icon"><i class="fas fa-smog"></i></div>
+                <h3>1. Carbon Dioxide (CO₂)</h3>
+                <h4>The Leading Cause of Global Temperature Rise</h4>
+                
+                <p>Coal mining emits significant amounts of CO₂, primarily from:</p>
+                
+                <ul class="impact-list">
+                    <li><i class="fas fa-truck"></i> Diesel-powered equipment used in excavation, transportation, and drilling.</li>
+                    <li><i class="fas fa-bomb"></i> Blasting operations, which release CO₂ from explosives.</li>
+                    <li><i class="fas fa-plug"></i> Fossil fuel-based electricity used in underground mine ventilation and processing plants.</li>
+                    <li><i class="fas fa-shipping-fast"></i> Transportation of coal, which relies on high-emission trucks, railways, and conveyor belts.</li>
+                </ul>
+                
+                <div class="impact-footer">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Once released into the atmosphere, CO₂ can persist for hundreds of years, continuously trapping heat. The energy sector, largely driven by coal, is responsible for nearly <strong>40%</strong> of global CO₂ emissions.</p>
+                </div>
+            </div>
+            
+            <div class="impact-card methane-card">
+                <div class="impact-icon"><i class="fas fa-wind"></i></div>
+                <h3>2. Methane (CH₄)</h3>
+                <h4>A Greenhouse Gas 80 Times More Potent than CO₂</h4>
+                
+                <p>Coal mining is a major source of methane (CH₄), a gas far more effective at trapping heat than CO₂. Methane is released from:</p>
+                
+                <ul class="impact-list">
+                    <li><i class="fas fa-mountain"></i> Coal seams during mining operations.</li>
+                    <li><i class="fas fa-fan"></i> Ventilation systems in underground mines, which pump methane-laden air into the atmosphere.</li>
+                    <li><i class="fas fa-dungeon"></i> Abandoned coal mines, which continue to leak methane long after mining stops.</li>
+                </ul>
+                
+                <div class="impact-footer">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>While methane remains in the atmosphere for a shorter duration than CO₂, its heat-trapping ability is <strong>80 times stronger</strong> over a 20-year period.</p>
+                </div>
+            </div>
+            
+            <div class="impact-card">
+                <div class="impact-icon"><i class="fas fa-cloud-rain"></i></div>
+                <h3>3. Air Pollution and Extreme Weather</h3>
+                <h4>Health Risks and Environmental Damage</h4>
+                
+                <p>Coal mining releases fine particulate matter (PM2.5), sulfur dioxide (SO₂), and nitrogen oxides (NOₓ), all of which contribute to severe air pollution and respiratory diseases.</p>
+                
+                <ul class="impact-list">
+                    <li><i class="fas fa-lungs"></i> Increased smog and poor air quality lead to lung diseases and heart conditions.</li>
+                    <li><i class="fas fa-tint"></i> Sulfur emissions contribute to acid rain, destroying crops, forests, and aquatic ecosystems.</li>
+                    <li><i class="fas fa-temperature-high"></i> Climate change leads to unpredictable weather patterns, including heatwaves and floods.</li>
+                </ul>
+                
+                <div class="impact-footer">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Rising temperatures and extreme weather events threaten both human lives and ecosystems globally.</p>
+                </div>
+            </div>
+            
+            <div class="impact-card">
+                <div class="impact-icon"><i class="fas fa-tree"></i></div>
+                <h3>4. Deforestation and Land Degradation</h3>
+                <h4>Loss of Natural Carbon Sinks</h4>
+                
+                <p>Coal mining, particularly open-cast mining, leads to:</p>
+                
+                <ul class="impact-list">
+                    <li><i class="fas fa-cut"></i> Massive deforestation, reducing Earth's ability to absorb CO₂ naturally.</li>
+                    <li><i class="fas fa-seedling"></i> Loss of biodiversity, as habitats are destroyed for mining infrastructure.</li>
+                    <li><i class="fas fa-mountain"></i> Soil erosion and degradation, making land unsuitable for agriculture.</li>
+                </ul>
+                
+                <div class="impact-footer">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>The loss of forests eliminates natural carbon sinks and worsens local climate conditions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-banner">
+            <div class="action-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="action-content">
+                <h3>The Urgent Need for Action</h3>
+                <p>With climate change worsening, the role of coal mining in global emissions must be addressed. However, many mining companies lack accurate tools to quantify their emissions, making it difficult to track progress and implement solutions.</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Shortcomings in Current Emission Calculation Models</h2>
+        
+        <p class="intro-text">Current carbon footprint calculation models for coal mines suffer from several significant limitations that prevent accurate measurement and meaningful reduction of emissions:</p>
+        
+        <div class="shortcomings-grid">
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="fas fa-ruler-combined"></i></div>
+                <h4>Static Emission Factors</h4>
+                <p>Existing models rely on generic emission factors that fail to account for regional variations in coal properties, mine-specific conditions, and operational differences.</p>
+            </div>
+            
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="fas fa-puzzle-piece"></i></div>
+                <h4>Incomplete Emission Sources</h4>
+                <p>Most models overlook critical sources like post-mining methane leakage, Scope 3 emissions from transportation and equipment, and fugitive methane from underground operations.</p>
+            </div>
+            
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="fas fa-mountain"></i></div>
+                <h4>Mine-Type Variability</h4>
+                <p>The distinct emission profiles of open-cast mines versus underground mines are rarely differentiated in current tools.</p>
+            </div>
+            
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="fas fa-balance-scale"></i></div>
+                <h4>Methodology Discrepancies</h4>
+                <p>"Bottom-up" estimates often exceed "top-down" measurements by 10–24%, largely due to inadequate accounting for non-combustion coal uses.</p>
+            </div>
+            
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="far fa-clock"></i></div>
+                <h4>Lack of Real-Time Data</h4>
+                <p>Traditional models rely on annual production figures rather than continuous monitoring, resulting in delayed and potentially inaccurate emissions reporting.</p>
+            </div>
+            
+            <div class="shortcoming-item">
+                <div class="shortcoming-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <h4>Regional Blind Spots</h4>
+                <p>India-specific factors like high-ash coal content and shallow mining depths increase emissions but are ignored by global models.</p>
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <h2 class="section-title"><i class="fas fa-lightbulb"></i> Our Solution: A New Approach to Carbon Footprint Analysis</h2>
+            
+            <p class="intro-text">Our carbon footprint analyzer addresses these shortcomings through an advanced, mine-specific approach:</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-database"></i></div>
+                    <h4>Comprehensive Data Collection</h4>
+                    <p>Captures all emission sources including fugitive methane, transportation, and post-mining activities.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
+                    <h4>Mine-Specific Variables</h4>
+                    <p>Accounts for coal properties, mining depth, ventilation rates, and regional factors unique to each operation.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Real-Time Monitoring</h4>
+                    <p>Enables continuous tracking rather than periodic estimates, allowing for immediate intervention when emissions spike.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                    <h4>Differentiated Analysis</h4>
+                    <p>Provides tailored calculations for open-cast and underground mines based on their unique emission profiles.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4>Actionable Insights</h4>
+                    <p>Identifies specific areas for emission reduction and simulates the impact of adopting cleaner technologies.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h4>India-Focused Parameters</h4>
+                    <p>Incorporates India-specific coal characteristics and mining practices for more accurate local measurements.</p>
+                </div>
+            </div>
+            
+            <div class="benefits-section">
+                <h3 class="benefits-title"><i class="fas fa-check-circle"></i> Take Control of Your Carbon Footprint</h3>
+                
+                <p class="benefits-intro">With our solution, coal mining operations can:</p>
+                
+                <div class="benefits-container">
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-tasks"></i></div>
+                        <div class="benefit-content">
+                            <h5>Track and quantify emissions</h5>
+                            <p>Based on detailed activity-wise data that captures every aspect of your operation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="benefit-content">
+                            <h5>Visualize emission trends</h5>
+                            <p>Monitor changes over time using interactive dashboards and comprehensive reports.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-balance-scale"></i></div>
+                        <div class="benefit-content">
+                            <h5>Compare emission levels</h5>
+                            <p>Benchmark performance across different mines and identify key areas for reduction.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="benefit-content">
+                            <h5>Improve compliance</h5>
+                            <p>Meet environmental regulations with transparent, accurate reporting systems.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="benefit-content">
+                            <h5>Develop targeted strategies</h5>
+                            <p>Create mitigation plans based on your mine's specific emission profile.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="benefit-content">
+                            <h5>Demonstrate responsibility</h5>
+                            <p>Show commitment to sustainability to stakeholders and communities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="conclusion-banner">
+                <p>By bringing data-driven insights to the coal mining industry, we empower companies to take meaningful action toward emission reduction, ensuring a more sustainable and climate-conscious future.</p>
+                <a href="{% url 'Model:Calculator' %}" class="cta-button"><i class="fas fa-calculator"></i> Start Tracking Emissions Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Highlight current page in navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

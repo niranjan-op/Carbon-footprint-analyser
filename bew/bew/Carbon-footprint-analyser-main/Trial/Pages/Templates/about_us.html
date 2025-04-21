@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Carbon Emissions Tracker</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/about_us.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="company-name">
+            <a href="{% url 'home' %}">CarbonTrack</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'contactus' %}">Contact Us</a>
+            <a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a>
+            <a href="{% url 'methodology' %}">Methodology</a>   
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">About Our Platform</h1>
+        
+        <section class="section">
+            <h2 class="section-title">Coal Mining and Carbon Emissions</h2>
+            <p class="argument">Argument: Coal mining releases large amounts of carbon dioxide (CO₂) and methane (CH₄), making it a major contributor to global warming. Despite India's efforts to meet climate commitments, most coal mines lack precise tools to track their emissions accurately. This leads to underreported carbon footprints and ineffective management strategies.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our platform provides a detailed, activity-wise carbon emission calculator that accounts for all major emission sources, not just methane. By using industry-specific emission factors, we ensure that coal mines receive accurate, transparent, and data-driven insights into their environmental impact.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Lack of Real-Time Data and Visualization</h2>
+            <p class="argument">Argument: Most existing tools rely on spreadsheets and outdated manual calculations, making data tracking inefficient. Mine operators struggle with analyzing long-term emission trends, leading to poor decision-making.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>We introduce interactive dashboards and real-time data visualization, replacing static spreadsheets with dynamic graphs and reports. This allows mines to monitor, compare, and analyze their carbon footprint effortlessly over time.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">One-Size-Fits-All Approach in Current Models</h2>
+            <p class="argument">Argument: Current emission tracking models treat all mines the same, ignoring key differences between underground and open-cast mines. This leads to inaccurate carbon footprint estimations and inefficient mitigation planning.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our system allows customized input based on mine type, ensuring that both underground and open-cast mining operations get emission estimates tailored to their specific processes and challenges.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Static Emission Factors Lead to Inaccuracies</h2>
+            <p class="argument">Argument: Many tools rely on fixed IPCC emission factors, ignoring regional variations in coal composition, fuel efficiency, and mining techniques. This leads to inaccurate and generalized results that do not reflect real-world conditions.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our platform uses dynamic, region-specific emission factors that consider coalfield variations, making emission estimates more precise and reflective of real mining conditions.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Regulatory Compliance and Reporting Challenges</h2>
+            <p class="argument">Argument: Many coal mines struggle to comply with evolving environmental regulations due to lack of proper emission tracking and standardized reporting systems. Inaccurate data can lead to penalties, delays in approvals, and missed sustainability targets.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our platform automates carbon footprint calculations and generates standardized reports aligned with regulatory requirements, making compliance easier, faster, and more transparent for mining operators.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Absence of Historical Emission Tracking</h2>
+            <p class="argument">Argument: Without a centralized database to track past emissions, mines cannot analyze trends, compare performance, or assess the impact of operational changes. This limits their ability to make data-driven improvements.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>We provide historical data storage and comparison tools, allowing mine operators to track their carbon footprint over time and measure progress toward sustainability goals.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Limited Accessibility and Usability</h2>
+            <p class="argument">Argument: Most existing emission tracking tools require technical expertise or are difficult to use, leading to inconsistent data entry and poor adoption by mining personnel.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our system is designed for ease of use, featuring intuitive dashboards, guided data input, and automated calculations, ensuring any mine operator—regardless of technical background—can efficiently track emissions.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Lack of a Scalable Solution for Different Mine Sizes</h2>
+            <p class="argument">Argument: Small and medium-sized mines often lack access to robust carbon footprint tracking tools, as existing solutions are either too complex or too expensive.</p>
+            <div class="our-help">
+                <p class="our-help-title">Our Help:</p>
+                <p>Our web-based platform is scalable and adaptable, allowing mines of all sizes—large, medium, or small—to track their emissions accurately, ensuring wider accessibility across the industry.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">Our Mission</h2>
+            <p>By tackling these industry-wide challenges, our solution helps coal mines take control of their carbon footprint, ensuring efficient monitoring, compliance, and long-term sustainability. Our web-based platform is revolutionizing carbon emission tracking for Indian coal mines, ensuring efficiency, accuracy, and better environmental accountability.</p>
+        </section>
+    </main>
+
+    <script>
+        // Highlight current page in navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

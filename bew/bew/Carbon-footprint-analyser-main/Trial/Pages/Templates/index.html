@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <script>
+        // Check if calculator state exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculatorState = sessionStorage.getItem('calculatorFormState');
+            const timestamp = sessionStorage.getItem('calculatorStateTimestamp');
+            
+            // Only show notification if state exists and is less than 30 minutes old
+            if (calculatorState && timestamp && (Date.now() - timestamp < 30 * 60 * 1000)) {
+                const notification = document.createElement('div');
+                notification.className = 'calculator-state-notification';
+                notification.innerHTML = `
+                    <p>You have unsaved calculator data. <a href="{% url 'Model:Calculator' %}">Return to Calculator</a></p>
+                    <button onclick="this.parentElement.style.display='none';">×</button>
+                `;
+                document.body.prepend(notification);
+            }
+        });
+    </script>
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="{% url 'contactus' %}">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+            <li><a href="{% url 'methodology' %}">Methodology</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>Welcome to My Website</h1>
+        <p>This is the home page.</p>
+    </div>
+</body>
+</html>

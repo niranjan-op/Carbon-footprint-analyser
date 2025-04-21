@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonTrack | Coal Mining Emissions & Climate Impact</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Bar */
+        .header {
+            background: linear-gradient(to right, #1a1a1a, #333);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .company-name a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #4CAF50;
+;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #4CAF50;
+;
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        /* Hero Image Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('home.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        /* Content Section */
+        .content {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .content h2 {
+            color: #2c3e50;
+            margin: 40px 0 20px;
+            font-size: 2rem;
+            border-bottom: 2px solid #4CAF50;
+;
+            padding-bottom: 10px;
+        }
+        
+        .content h3 {
+            color: #4CAF50;
+;
+            margin: 30px 0 15px;
+            font-size: 1.5rem;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .content ul {
+            margin-bottom: 25px;
+            padding-left: 30px;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight-box {
+            background-color: #f0f0f0;
+            border-left: 4px solid #4CAF50;
+;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: #4CAF50;
+;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .cta-button:hover {
+            background-color: #b81a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.4rem;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .content h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .company-name {
+                margin-bottom: 15px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+            
+            .content {
+                margin: 30px auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="company-name">
+            <a href="index.html">CarbonTrack</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'contactus' %}">Contact Us</a>
+            <a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a>
+            <a href="{% url 'methodology' %}">Methodology</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>The Impact of Coal Mine Emissions on Global Warming</h1>
+        <h2>Coal Mining: A Major Driver of Climate Change</h2>
+    </section>
+
+    <div class="content">
+        <p>Coal has powered industries and economies for centuries, but its environmental cost is undeniable. Coal mining operations release massive amounts of greenhouse gases, including carbon dioxide (CO₂) and methane (CH₄), both of which trap heat and accelerate global warming.</p>
+        
+        <p>India, as the second-largest coal producer in the world, depends heavily on coal for energy. However, this comes with severe environmental consequences, including rising temperatures, extreme weather, deforestation, and air pollution. Without accurate tracking and reduction of emissions, the negative impacts of coal mining will continue to escalate.</p>
+        
+        <h2>How Coal Mining Contributes to Global Warming</h2>
+        
+        <h3>1. Carbon Dioxide (CO₂) – The Leading Cause of Global Temperature Rise</h3>
+        
+        <p>Coal mining emits significant amounts of CO₂, primarily from:</p>
+        
+        <ul>
+            <li>Diesel-powered equipment used in excavation, transportation, and drilling.</li>
+            <li>Blasting operations, which release CO₂ from explosives.</li>
+            <li>Fossil fuel-based electricity used in underground mine ventilation and processing plants.</li>
+            <li>Transportation of coal, which relies on high-emission trucks, railways, and conveyor belts.</li>
+        </ul>
+        
+        <p>Once released into the atmosphere, CO₂ can persist for hundreds of years, continuously trapping heat and contributing to global temperature rise. The energy sector, largely driven by coal, is responsible for nearly 40% of global CO₂ emissions.</p>
+        
+        <h3>2. Methane (CH₄) – A Greenhouse Gas 80 Times More Potent than CO₂</h3>
+        
+        <p>Coal mining is a major source of methane (CH₄), a gas far more effective at trapping heat than CO₂. Methane is released from:</p>
+        
+        <ul>
+            <li>Coal seams during mining operations.</li>
+            <li>Ventilation systems in underground mines, which pump methane-laden air into the atmosphere.</li>
+            <li>Abandoned coal mines, which continue to leak methane long after mining stops.</li>
+        </ul>
+        
+        <p>While methane remains in the atmosphere for a shorter duration than CO₂, its heat-trapping ability is 80 times stronger over a 20-year period, making it one of the most dangerous accelerators of climate change.</p>
+        
+        <h3>3. Air Pollution and Extreme Weather Events</h3>
+        
+        <p>Coal mining releases fine particulate matter (PM2.5), sulfur dioxide (SO₂), and nitrogen oxides (NOₓ), all of which contribute to severe air pollution and respiratory diseases.</p>
+        
+        <ul>
+            <li>Increased smog and poor air quality lead to lung diseases, heart conditions, and premature deaths.</li>
+            <li>Sulfur emissions from coal mining contribute to acid rain, which destroys crops, forests, and aquatic ecosystems.</li>
+            <li>Intensified climate change leads to unpredictable weather patterns, including more frequent heatwaves, cyclones, floods, and droughts.</li>
+        </ul>
+        
+        <p>Rising temperatures and extreme weather events caused by coal mining emissions threaten both human lives and ecosystems, making immediate action essential.</p>
+        
+        <h3>4. Deforestation and Land Degradation</h3>
+        
+        <p>Coal mining, particularly open-cast mining, leads to:</p>
+        
+        <ul>
+            <li>Massive deforestation, reducing Earth's ability to absorb CO₂ naturally.</li>
+            <li>Loss of biodiversity, as habitats are destroyed for mining infrastructure.</li>
+            <li>Soil erosion and degradation, making land unsuitable for agriculture and ecosystem restoration.</li>
+        </ul>
+        
+        <p>The loss of forests not only eliminates a natural carbon sink, but also worsens local climate conditions, causing drier landscapes and increased dust storms.</p>
+        
+        <div class="highlight-box">
+            <h3>The Urgent Need for Action</h3>
+            <p>With climate change worsening, the role of coal mining in global emissions must be addressed. However, many mining companies lack accurate tools to quantify their emissions, making it difficult to track progress and implement solutions.</p>
+        </div>
+        
+        <h2>Our Solution: Enabling Mines to Take Control of Their Carbon Footprint</h2>
+        
+        <p>We provide a web-based platform designed to help coal mines:</p>
+        
+        <ul>
+            <li><strong> Track and quantify their emissions</strong> based on detailed activity-wise data.</li>
+            <li><strong> Visualize emission trends</strong> over time using interactive dashboards and reports.</li>
+            <li><strong> Compare emission levels</strong> across different mines, identifying areas for reduction.</li>
+            <li><strong> Improve compliance</strong> with environmental regulations by providing transparent reporting.</li>
+        </ul>
+        
+        <p>By bringing data-driven insights to the coal mining industry, we empower companies to take meaningful action toward emission reduction, ensuring a more sustainable and climate-conscious future.</p>
+        
+        <a href="calculator.html" class="cta-button">Start Tracking Emissions Now</a>
+    </div>
+
+    <script>
+        // Highlight current page in navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

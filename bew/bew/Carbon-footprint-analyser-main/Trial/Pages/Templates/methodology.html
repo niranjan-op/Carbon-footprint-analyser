@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology | CarbonTrack</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Bar */
+        .header {
+            background: linear-gradient(to right, #1a1a1a, #333);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .company-name a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #4CAF50;
+;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #4CAF50;
+;
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        /* Content Section */
+        .content {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            position: relative;
+        }
+        
+        .page-title:after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -15px;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: #4CAF50;
+;
+        }
+        
+        .content h2 {
+            color: #2c3e50;
+            margin: 40px 0 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #4CAF50;
+;
+            padding-bottom: 8px;
+        }
+        
+        .content h3 {
+            color: #4CAF50;
+;
+            margin: 30px 0 15px;
+            font-size: 1.4rem;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .content ul {
+            margin-bottom: 25px;
+            padding-left: 30px;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .formula-box {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #4CAF50;
+;
+        }
+        
+        .formula-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .formula {
+            font-family: monospace;
+            font-size: 1.1rem;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .formula-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .highlight-box {
+            background-color: #f0f0f0;
+            border-left: 4px solid #4CAF50;
+;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .company-name {
+                margin-bottom: 15px;
+            }
+            
+            .content {
+                margin: 30px auto;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="company-name">
+            <a href="index.html">CarbonTrack</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'contactus' %}">Contact Us</a>
+            <a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a>
+            <a href="{% url 'methodology' %}">Methodology</a>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1 class="page-title">Methodology</h1>
+        
+        <p>To determine the carbon footprint of coal mining, begin by defining assessment boundaries, including operational scope, geographical limits, and time frame. The calculation encompasses emissions from mining, energy use, transportation, and waste management.</p>
+        
+        <h2>Emission Calculation Methodology</h2>
+        
+        <h3>1. Coal Production Emissions</h3>
+        <p>Estimate CO₂ emissions by multiplying annual coal output with factors for energy content, exclusions, and CO₂ per energy unit.</p>
+        
+        <h3>2. Mine-Type Emissions</h3>
+        <ul>
+            <li><strong>Open-Cast Mines:</strong> Account for diesel used in overburden removal and carbon loss from land disturbance.</li>
+            <li><strong>Underground Mines:</strong> Calculate methane (CH₄) emissions, converted to CO₂ equivalents using global warming potential (GWP).</li>
+        </ul>
+        
+        <h3>3. Equipment & Fuel Emissions</h3>
+        <p>Include CO₂ from diesel machinery, explosives, and electricity, factoring in regional emission rates.</p>
+        
+        <h3>4. Transportation Emissions</h3>
+        <p>Use transport mode-specific factors to calculate emissions from coal and waste transport distances.</p>
+        
+        <h3>5. Waste Management</h3>
+        <p>Address emissions from refuse transport and disposal.</p>
+        
+        <div class="highlight-box">
+            <p>Finally, sum emissions across all stages, adjusting for region-specific factors and uncertainties for accurate, repeatable results. This method ensures detailed tracking of emissions and encourages transparency in carbon footprint assessments.</p>
+        </div>
+        
+        <h2>Formulae</h2>
+        
+        <div class="formula-box">
+            <div class="formula-title">Land disturbance:</div>
+            <div class="formula">CO₂ = Area Disturbed (ha) × Carbon Stock Loss (tonnes CO₂/ha)</div>
+        </div>
+        
+        <div class="formula-box">
+            <div class="formula-title">Methane emissions:</div>
+            <div class="formula">CO₂ = CH₄ released (m³) × Methane Emission Factor × (16.04 / 22.914) × 1000</div>
+            <div class="formula-note">Where 16.04 is the molecular weight of methane and 22.914 is the molar volume at standard conditions</div>
+        </div>
+        
+        <h3>Equipment & Fuel Emission:</h3>
+        
+        <div class="formula-box">
+            <div class="formula-title">A) Diesel Powered Machinery:</div>
+            <div class="formula">CO₂ = Diesel Used (liters) × Avg Emission Factor for all machines (kg CO₂/liter)</div>
+        </div>
+        
+        <div class="formula-box">
+            <div class="formula-title">B) Explosives:</div>
+            <div class="formula">CO₂ = Explosives Used (kg) × Emission Factor (kg CO₂/kg)</div>
+        </div>
+        
+        <div class="formula-box">
+            <div class="formula-title">C) Electricity Used:</div>
+            <div class="formula">CO₂ = Electricity (MWh) × Grid Emission Factor (kg CO₂/MWh)</div>
+        </div>
+        
+        <div class="formula-box">
+            <div class="formula-title">Transport:</div>
+            <div class="formula">CO₂ = Distance (km) × Coal Weight (tonnes) × Emission Factor (kg CO₂/tonne km)</div>
+        </div>
+        
+        <div class="formula-box">
+            <div class="formula-title">Carbon Sequestration Potential:</div>
+            <div class="formula">CO₂ = Area reforested (ha) × Carbon Sequestration Rate (tonnes CO₂/ha/year)</div>
+        </div>
+    </div>
+
+    <script>
+        // Highlight current page in navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

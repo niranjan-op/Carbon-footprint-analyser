@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Results</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Results_styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% if not user.is_authenticated %}
+        {% include 'alerts/login_required_alert.html' %}
+        {% endif %}
+        
+        <div class="results-header">
+            <h1>Carbon Footprint Analysis Results</h1>
+            <p class="timestamp">Analysis performed on: {{ emission.calculation_date|date:"F d, Y H:i" }}</p>
+        </div>
+
+        <div class="results-summary">
+            <div class="summary-card total">
+                <h2>Total Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Carbon_footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e</span>
+                </div>
+            </div>
+            
+            <div class="summary-card per-tonne">
+                <h2>Net Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Net_Carbon_Footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e/tonne</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-charts">
+            <div class="chart-container">
+                <h2>Emissions Breakdown</h2>
+                <canvas id="emissionsBreakdownChart"></canvas>
+            </div>
+        </div>
+
+        <div class="detailed-results">
+            <h2>Detailed Results</h2>
+            
+            <div class="results-section">
+                <h3>Coal Production Emissions</h3>
+                <table class="results-table">
+                    <tr>
+                        <th>Coal Type</th>
+                        <th>Amount (tonnes)</th>
+                    </tr>
+                    {% if emission.anthracite > 0 %}
+                    <tr>
+                        <td>Anthracite</td>
+                        <td>{{ emission.anthracite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Coking)</td>
+                        <td>{{ emission.bituminous_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_non_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Non-Coking)</td>
+                        <td>{{ emission.bituminous_non_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.subbituminous > 0 %}
+                    <tr>
+                        <td>Subbituminous</td>
+                        <td>{{ emission.subbituminous|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.lignite > 0 %}
+                    <tr>
+                        <td>Lignite</td>
+                        <td>{{ emission.lignite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            <div class="results-section">
+                <h3>Operational Emissions</h3>
+                <table class="results-table">
+                    {% if emission.diesel_used > 0 %}
+                    <tr>
+                        <td>Diesel Used</td>
+                        <td>{{ emission.diesel_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.diesel_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.petrol_used > 0 %}
+                    <tr>
+                        <td>Petrol Used</td>
+                        <td>{{ emission.petrol_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.petrol_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.electricity_used > 0 %}
+                    <tr>
+                        <td>Electricity Used</td>
+                        <td>{{ emission.electricity_used|floatformat:2 }} MWh</td>
+                        <td>{{ emission.electricity_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.explosive_emissions > 0 %}
+                    <tr>
+                        <td>Explosives</td>
+                        <td>Various</td>
+                        <td>{{ emission.explosive_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.transport_emissions > 0 %}
+                    <tr>
+                        <td>Transportation</td>
+                        <td>Various</td>
+                        <td>{{ emission.transport_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            {% if emission.overburden_removed > 0 or emission.land_disturbance > 0 %}
+            <div class="results-section">
+                <h3>Open Cast Mining Impacts</h3>
+                <table class="results-table">
+                    {% if emission.overburden_removed > 0 %}
+                    <tr>
+                        <td>Overburden Removed</td>
+                        <td>{{ emission.overburden_removed|floatformat:2 }} m³</td>
+                        <td>{{ emission.overburden_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.land_disturbance > 0 %}
+                    <tr>
+                        <td>Land Disturbance</td>
+                        <td>{{ emission.land_disturbance|floatformat:2 }} hectares</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.total_ch4 > 0 %}
+            <div class="results-section">
+                <h3>Underground Mining Impacts</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Methane Emissions</td>
+                        <td>{{ emission.total_ch4|floatformat:2 }} m³</td>
+                        <td>{{ emission.methane_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.waste > 0 %}
+            <div class="results-section">
+                <h3>Waste Management</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Waste Generated</td>
+                        <td>{{ emission.waste|floatformat:2 }} tonnes</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.sequestration > 0 %}
+            <div class="results-section positive-impact">
+                <h3>Carbon Sequestration</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Area Reforested</td>
+                        <td>{{ emission.sequestration|floatformat:2 }} hectares</td>
+                        <td>Carbon offset included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="recommendations">
+            <h2>Recommendations</h2>
+            <div class="recommendation-card">
+                <h3>Reduce Emissions</h3>
+                <ul>
+                    <li>Consider investing in more efficient equipment to reduce diesel and petrol consumption</li>
+                    <li>Explore renewable energy options to reduce reliance on grid electricity</li>
+                    <li>Optimize transportation routes and vehicles to minimize transport emissions</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h3>Offset Carbon Footprint</h3>
+                <ul>
+                    <li>Increase reforestation efforts in disturbed areas</li>
+                    <li>Invest in certified carbon offset projects</li>
+                    <li>Implement progressive rehabilitation practices</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}" class="button">New Calculation</a>
+            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.financial_year }}" class="config-button">
+                <span class="button-text">Configure Constants</span>
+                <span class="button-icon">⚙️</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}?financial_year={{emission.financial_year}}" class="button edit-button">View/Edit Input Values</a>
+            <button class="button print-button" onclick="window.print()">Print Results</button>
+        </div>
+    </div>
+
+    <!-- Hidden inputs to store emission values for JavaScript -->
+    <input type="hidden" id="coalEmissions" value="{{ emission.coal_emissions|default:0 }}">
+    <input type="hidden" id="dieselEmissions" value="{{ emission.diesel_emissions|default:0 }}">
+    <input type="hidden" id="petrolEmissions" value="{{ emission.petrol_emissions|default:0 }}">
+    <input type="hidden" id="explosiveEmissions" value="{{ emission.explosive_emissions|default:0 }}">
+    <input type="hidden" id="electricityEmissions" value="{{ emission.electricity_emissions|default:0 }}">
+    <input type="hidden" id="transportEmissions" value="{{ emission.transport_emissions|default:0 }}">
+    <input type="hidden" id="methaneEmissions" value="{{ emission.methane_emissions|default:0 }}">
+    <input type="hidden" id="overburdenEmissions" value="{{ emission.overburden_emissions|default:0 }}">
+    <input type="hidden" id="wasteEmissions" value="{{ emission.waste|default:0 }}">
+
+    <!-- Include the external JS file -->
+    <script src="{% static 'js/Results.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout Confirmation</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link rel="stylesheet" href="../../static/styles/logout.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <div class="logout-confirmation">
+            <h1>Logout Confirmation</h1>
+            <p>Are you sure you want to log out?</p>
+            <div class="confirmation-buttons">
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Yes, Log Out</button>
+                </form>
+                <a href="{% url 'home' %}" class="cancel-button">No, Take Me Back</a>
+            </div>
+        </div>
+    </div>
+<!-- Only these class additions needed -->
+<div class="logout-confirmation confirmation-box">
+    <!-- Your existing content -->
+    <a href="/dashboard" class="cancel-button">No, take me back</a>
+  </div>
+  
+  <!-- For red boxes (if they exist) -->
+  <div class="alert-error"> <!-- or "red-box" -->
+    Message content here
+  </div>
+</body>
+</html>
