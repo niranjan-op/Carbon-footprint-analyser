@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Projects</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <div class="header-with-back">
+            <h1>Your Past Projects</h1>
+            <a href="{% url 'Model:Calculator' %}" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back to Calculator</span>
+            </a>
+        </div>
+        
+        <div class="search-container">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search by financial year..." value="{{ search_query }}" 
+                       pattern="20\d{2}-20\d{2}" title="Format: YYYY-YYYY (e.g., 2023-2024)">
+                <button type="submit" class="search-button">Search</button>
+                {% if search_query %}
+                    <a href="{% url 'Model:past_projects' %}" class="clear-search">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if search_query and not projects %}
+        <div class="no-results">
+            <p>No projects found matching "{{ search_query }}"</p>
+        </div>
+        {% endif %}
+        
+        {% if projects %}
+            <div class="projects-list">
+                {% for project in projects %}
+                    <div class="project-card">
+                        <h2>{{ project.financial_year }}</h2>
+                        <p><strong>Date:</strong> {{ project.calculation_date }}</p>
+                        <p><strong>Total Carbon Footprint:</strong> {{ project.Carbon_footprint|floatformat:2 }} kg CO₂e</p>
+                        <p><strong>Net Carbon Footprint:</strong> {{ project.Net_Carbon_Footprint|floatformat:2 }} kg CO₂e</p>
+                        
+                        <div class="project-details">
+                            <h3>Coal Production</h3>
+                            <ul>
+                                {% if project.anthracite > 0 %}<li>Anthracite: {{ project.anthracite }} tonnes</li>{% endif %}
+                                {% if project.bituminous_coking > 0 %}<li>Bituminous (Coking): {{ project.bituminous_coking }} tonnes</li>{% endif %}
+                                {% if project.bituminous_non_coking > 0 %}<li>Bituminous (Non-Coking): {{ project.bituminous_non_coking }} tonnes</li>{% endif %}
+                                {% if project.subbituminous > 0 %}<li>Subbituminous: {{ project.subbituminous }} tonnes</li>{% endif %}
+                                {% if project.lignite > 0 %}<li>Lignite: {{ project.lignite }} tonnes</li>{% endif %}
+                            </ul>
+                            
+                            <h3>Fuels and Electricity</h3>
+                            <ul>
+                                {% if project.diesel_used > 0 %}<li>Diesel: {{ project.diesel_used }} liters</li>{% endif %}
+                                {% if project.petrol_used > 0 %}<li>Petrol: {{ project.petrol_used }} liters</li>{% endif %}
+                                {% if project.electricity_used > 0 %}<li>Electricity: {{ project.electricity_used }} MWh</li>{% endif %}
+                            </ul>
+                            
+                            {% if project.explosives_data %}
+                            <h3>Explosives</h3>
+                            <ul>
+                                {% for explosive in project.explosives_data %}
+                                <li>{{ explosive.explosive_type }}: Emission Factor {{ explosive.emission_factor }} kg CO₂/kg</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            {% if project.transports_data %}
+                            <h3>Transportation</h3>
+                            <ul>
+                                {% for transport in project.transports_data %}
+                                <li>{{ transport.transport_type }}: Emission Factor {{ transport.emission_factor }} kg CO₂/km</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            <h3>Other Factors</h3>
+                            <ul>
+                                {% if project.waste > 0 %}<li>Waste: {{ project.waste }} tonnes</li>{% endif %}
+                                {% if project.sequestration > 0 %}<li>Sequestration: {{ project.sequestration }} hectares</li>{% endif %}
+                                {% if project.overburden_removed > 0 %}<li>Overburden Removed: {{ project.overburden_removed }} m³</li>{% endif %}
+                                {% if project.land_disturbance > 0 %}<li>Land Disturbance: {{ project.land_disturbance }} hectares</li>{% endif %}
+                                {% if project.total_ch4 > 0 %}<li>Methane Emissions: {{ project.total_ch4 }} m³</li>{% endif %}
+                            </ul>
+                        </div>
+                        
+                        <div class="project-actions">
+                            <a href="{% url 'Model:Results' project.financial_year %}" class="action-button view-button">View Results</a>
+                            <a href="{% url 'Model:Calculator' %}?financial_year={{ project.financial_year }}" class="action-button edit-button">Edit Project</a>
+                            <a href="{% url 'Model:delete_project' project.financial_year %}" class="action-button delete-button" 
+                               onclick="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
+                                Delete Project
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-projects">
+                <p>You haven't created any projects yet.</p>
+                <a href="{% url 'Model:Calculator' %}" class="cta-button">Create Your First Project</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <style>
+        .projects-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .project-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .project-card h2 {
+            color: #4CAF50;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .project-details {
+            margin: 15px 0;
+        }
+        
+        .project-details h3 {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+        
+        .project-details ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .project-details li {
+            padding: 3px 0;
+            font-size: 14px;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-button {
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .view-button {
+            background-color: #4CAF50;
+        }
+        
+        .edit-button {
+            background-color: #2196F3;
+        }
+        
+        .delete-button {
+            background-color: #F44336;
+        }
+        
+        .action-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .no-projects {
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .projects-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .search-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .search-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-form input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .search-button:hover {
+            background-color: #45a049;
+        }
+        
+        .clear-search {
+            padding: 8px 15px;
+            background-color: #F44336;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .clear-search:hover {
+            background-color: #e53935;
+        }
+        
+        .no-results {
+            text-align: center;
+            margin: 20px 0;
+            color: #555;
+        }
+    </style>
+</body>
+</html>

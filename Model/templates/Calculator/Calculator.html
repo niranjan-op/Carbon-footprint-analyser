@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+    {% load model_extras %}
+    {% load dict_extras %}
+    <link rel="stylesheet" href="{% static 'styles/Calculator_styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="container">
+        <form class="carbon-footprint-form" method="POST">
+            {% csrf_token %}
+            
+            {% if not user.is_authenticated %}
+            {% include 'alerts/login_required_alert.html' %}
+            {% else %}
+            <div>
+                <p>View previous projects:</p>
+                <a href="{% url 'Model:past_projects' %}">Past projects</a>
+            </div>
+            {% endif %}
+            
+            {% if past_emission %}
+            <div class="edit-project-notice">
+                <div class="notice-icon">📝</div>
+                <div class="notice-content">
+                    <h3>Editing Project: {{ past_emission.financial_year }}</h3>
+                    <p>You are currently viewing/editing input values from your past project. Make changes and recalculate, or go back to results.</p>
+                    <a href="{% url 'Model:Results' past_emission.financial_year %}" class="config-button">
+                        <span class="button-text">Back to Results</span>
+                        <span class="button-icon">→</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="config-notice">
+                <div class="notice-icon">⚙️</div>
+                <div class="notice-content">
+                    <h3>Customize Your Analysis!</h3>
+                    <p>For more accurate carbon footprint results tailored to your specific operations, please review and adjust the calculation constants before proceeding.</p>
+                    <a href="{% url 'Model:Configure_Constants' %}" class="config-button">
+                        <span class="button-text">Configure Constants</span>
+                        <span class="button-icon">→</span>
+                    </a>
+                </div>
+            </div>
+            <h1>Carbon footprint analyser</h1>
+            
+            <!-- Add a project name field if editing a past project -->
+            {% if past_emission %}
+            <div class="form-group">
+                <label for="project_name">Financial year</label>
+                <input type="text" id="financial_year" name="financial_year" value="{{ past_emission.financial_year }}" pattern="20\d{2}-20\d{2}" title="Format: YYYY-YYYY where second year is one year after first (e.g. 2023-2024)" required>
+                <div class="input-hint">Format: 20YY-20YY (e.g., 2023-2024)</div>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label for="project_name">Financial year</label>
+                <input type="text" id="financial_year" name="financial_year" placeholder="e.g., 2023-2024" pattern="20\d{2}-20\d{2}" title="Format: YYYY-YYYY where second year is one year after first (e.g. 2023-2024)" required>
+                <div class="input-hint">Format: YYYY-YYYY where second year is one year after first</div>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <h2>1. Mining Activities</h2>
+                <div class="radio-group">
+                    {% for radio in form.mine_type %}
+                    <div class="radio-item">
+                        {{ radio.tag }}
+                        <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Underground specific fields - hidden by default -->
+                <div id="underground-fields" style="display: none;">
+                    <div class="form-group">
+                        <h3>Methane Emissions</h3>
+                        <div class="sub-fields">
+                            <label for="total_ch4">Methane Emissions (m<sup>3</sup>)</label>
+                            {{form.total_ch4}}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Open cast specific fields - initially hidden -->
+                <div id="open-cast-fields" style="display: none;">
+                    <h3>Overburden</h3>
+                    <div class="form-group">
+                        <label for="overburden-ef">Volume of Overburden (m<sup>3</sup>)</label>
+                        {{form.overburden_removed}}
+                    </div>
+                    <h3>Land Disturbance</h3>
+                    <div class="form-group">
+                        <label for="land-disturbance">Area Disturbed (ha)</label>
+                        {{form.land_disturbance}}
+                    </div>
+                </div>
+
+                <h3>Coal and types of production</h3>
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="anthracite">Anthracite (tonnes)</label>
+                        {{form.anthracite}}
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-coking">Bituminous (Coking) (tonnes)</label>
+                        {{form.bituminous_coking}}
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="bituminous-non-coking">Bituminous (Non-Coking) (tonnes)</label>
+                        {{form.bituminous_non_coking}}
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="subbituminous">Subbituminous (tonnes)</label>
+                        {{form.subbituminous}}
+                    </div>
+                    <div class="sub-field-single">
+                        <label for="lignite">Lignite (tonnes)</label>
+                        {{form.lignite}}
+                    </div>
+                </div>
+            </div>
+            <h2>2. Equipments and fuel emissions</h2>
+            <div class="form-group">
+                <div class="sub-fields">
+                    <div class="sub-field-pair">
+                        <label for="diesel-machinery">Total Diesel Consumption (liters)</label>
+                        {{form.diesel_used}}
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="petrol-machinery">Total Petrol Consumption (liters)</label>
+                        {{form.petrol_used}}
+                    </div>
+                    <div class="sub-field-pair">
+                        <label for="electricity-used">Electricity Used (MWh)</label>
+                        {{form.electricity_used}}
+                    </div>
+                </div>
+                
+                <!-- Explosives Section -->
+                <div class="explosives-container">
+                    {% if explosives %}
+                        {% for explosive in explosives %}
+                        <div class="explosive-field">
+                            <label for="explosive_{{ explosive.id }}_amount">{{ explosive.explosive_type }} (kg)</label>
+                            <input type="number" id="explosive_{{ explosive.id }}_amount" 
+                                   name="explosive_{{ explosive.id }}_amount" step="0.01"
+                                   placeholder="Enter amount (kg)" class="explosive-input" 
+                                   value="{{ explosive_data|get_dict_item:explosive.id }}">
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-data-message">
+                            <p>No explosives configured. Please <a href="{% url 'Model:Configure_Constants' %}">configure constants</a> to add explosives.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Transportation Section -->
+                <h3>Transportation</h3>
+                <div class="transport-container">
+                    {% if transports %}
+                        {% for transport in transports %}
+                        <div class="transport-field">
+                            <label for="transport_{{ transport.id }}_distance">{{ transport.transport_type }} (km)</label>
+                            <input type="number" id="transport_{{ transport.id }}_distance" 
+                                   name="transport_{{ transport.id }}_distance" step="0.01"
+                                   placeholder="Enter distance (km)" class="transport-input"
+                                   value="{{ transport_data|get_dict_item:transport.id }}">
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-data-message">
+                            <p>No transport types configured. Please <a href="{% url 'Model:Configure_Constants' %}">configure constants</a> to add transport types.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+                <h3>Carbon Sequestration</h3>
+                <div class="sub-fields">
+                    <label for="Sequestration">Area Reforested (ha)</label>
+                    {{form.sequestration}}
+                </div>
+                <h3>Waste</h3>
+                <div class="sub-fields">
+                    <label for="waste">Waste generated</label>
+                    {{form.waste}}
+                </div>
+            </div>
+
+
+            
+            {% if past_emission %}
+            <div class="form-actions" action="POST">
+                <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
+                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'Model:Results' past_emission.financial_year %}'">Cancel</button>
+            </div>
+            {% else %}
+            <div class="form-actions" action="POST">
+                <button type="submit" class="submit-button">Calculate Carbon Footprint</button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+    <script src="{% static 'js/calculator.js' %}"></script>
+</body>
+</html>
