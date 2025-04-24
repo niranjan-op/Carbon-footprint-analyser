@@ -34,7 +34,7 @@ class CarbonEmissionAdmin(admin.ModelAdmin):
             'fields': ('diesel_used', 'petrol_used', 'explosives_used', 'electricity_used', 'overburden_removed')
         }),
         ('Transportation', {
-            'fields': ('transport_distance', 'transport_type')
+            'fields': ('transport_distance', 'transport_type', 'transport_weights')
         }),
         ('Results', {
             'fields': ('Carbon_footprint', 'coal_emissions', 'diesel_emissions', 

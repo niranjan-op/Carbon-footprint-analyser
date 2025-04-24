@@ -79,10 +79,10 @@
                 </div>
                 
                 <!-- Scale visualization showing footprint comparison with improved header -->
-                <div class="vis-card full-width">
+                <div class="vis-card scale-container">
                     <div class="scale-header">
-                        <h3>Carbon Footprint Performance Scale</h3>
-                        <p id="footprint-context">Your footprint of <span id="footprint-value">{{ emission.Carbon_footprint|floatformat:2 }}</span> tonnes CO₂e 
+                        <h3>Carbon Footprint Industry Benchmark Scale</h3>
+                        <p id="footprint-context">Your mine's carbon footprint of <span id="footprint-value">{{ emission.Carbon_footprint|floatformat:2 }}</span> tonnes CO₂e 
                            is <span id="footprint-position"></span>.</p>
                     </div>
                     <div class="vis-container">
@@ -91,23 +91,23 @@
                     <div id="scale-legend" class="scale-legend">
                         <div class="legend-item">
                             <span class="color-box low-impact"></span>
-                            <span class="legend-text">Low Impact</span>
+                            <span class="legend-text">Low Impact (<100,000 tonnes)</span>
                         </div>
                         <div class="legend-item">
                             <span class="color-box below-avg"></span>
-                            <span class="legend-text">Below Average</span>
+                            <span class="legend-text">Below Average (100k-250k)</span>
                         </div>
                         <div class="legend-item">
                             <span class="color-box average"></span>
-                            <span class="legend-text">Industry Average</span>
+                            <span class="legend-text">Industry Average (250k-500k)</span>
                         </div>
                         <div class="legend-item">
                             <span class="color-box above-avg"></span>
-                            <span class="legend-text">Above Average</span>
+                            <span class="legend-text">Above Average (500k-1M)</span>
                         </div>
                         <div class="legend-item">
                             <span class="color-box high-impact"></span>
-                            <span class="legend-text">High Impact</span>
+                            <span class="legend-text">High Impact (>1M tonnes)</span>
                         </div>
                     </div>
                 </div>
@@ -163,7 +163,7 @@
                     {% if emission.diesel_used > 0 %}
                     <tr>
                         <td>Diesel Used</td>
-                        <td>{{ emission.diesel_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.diesel_used }} liters</td>
                         <td>{{ emission.diesel_emissions|floatformat:2 }} kg CO₂e</td>
                     </tr>
                     {% endif %}
@@ -318,9 +318,46 @@
             chartData = {
                 pieChart: {labels: [], values: []},
                 trendChart: {years: [], values: [], is_actual: []},
-                scaleChart: {lowFootprint: 1000, avgFootprint: 5000, highFootprint: 10000, userFootprint: 0}
+                scaleChart: {
+                    lowFootprint: 100000, 
+                    belowAvg: 250000,
+                    avgFootprint: 500000, 
+                    aboveAvg: 1000000,
+                    highFootprint: 1000000, 
+                    userFootprint: 0,
+                    footprintPosition: "calculating..."
+                }
             };
         }
+        
+        // Create an expanded color palette for more transport types
+        const extendedColors = [
+            // Base colors
+            '#4CAF50', '#2196F3', '#FFC107', '#FF5722',
+            '#9C27B0', '#607D8B', '#E91E63', '#03A9F4', 
+            // Transport-specific colors (more blue/green variants)
+            '#00796B', '#006064', '#01579B', '#0D47A1',
+            '#1A237E', '#1B5E20', '#33691E', '#2E7D32',
+            '#00838F', '#0277BD', '#0097A7', '#00695C',
+            // Additional colors if needed
+            '#8BC34A', '#FF9800', '#795548', '#C2185B'
+        ];
+        
+        // Group the labels - collect all transport types
+        const transportLabels = [];
+        const transportData = [];
+        const nonTransportLabels = [];
+        const nonTransportData = [];
+        
+        chartData.pieChart.labels.forEach((label, index) => {
+            if (label.startsWith('Transport:')) {
+                transportLabels.push(label.replace('Transport:', '').trim());
+                transportData.push(chartData.pieChart.values[index]);
+            } else {
+                nonTransportLabels.push(label);
+                nonTransportData.push(chartData.pieChart.values[index]);
+            }
+        });
         
         // Create pie chart
         const pieCtx = document.getElementById('pieChart').getContext('2d');
@@ -330,10 +367,7 @@
                 labels: chartData.pieChart.labels,
                 datasets: [{
                     data: chartData.pieChart.values,
-                    backgroundColor: [
-                        '#4CAF50', '#2196F3', '#FFC107', '#FF5722',
-                        '#9C27B0', '#607D8B', '#E91E63', '#03A9F4'
-                    ],
+                    backgroundColor: extendedColors.slice(0, chartData.pieChart.labels.length),
                     borderWidth: 1
                 }]
             },
@@ -349,14 +383,55 @@
                         }
                     },
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        // Shorten transport labels for better display
+                                        const displayLabel = label.startsWith('Transport:') 
+                                            ? label.replace('Transport:', '🚚').trim() 
+                                            : label;
+                                        
+                                        return {
+                                            text: displayLabel,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(data.datasets[0].data[i]) || data.datasets[0].data[i] === 0,
+                                            lineCap: 'butt',
+                                            lineDash: [],
+                                            lineDashOffset: 0,
+                                            lineJoin: 'miter',
+                                            lineWidth: 1,
+                                            strokeStyle: '#fff',
+                                            pointStyle: 'circle',
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
+                            title: function(tooltipItems) {
+                                const title = tooltipItems[0].label || '';
+                                // Show full transport label in tooltip title
+                                return title;
+                            },
                             label: function(context) {
                                 const value = context.raw;
+                                // Show value with 2 decimal places and units
+                                return value.toFixed(2) + ' tonnes CO₂e';
+                            },
+                            afterLabel: function(context) {
+                                // Add weight information for transport items
                                 const label = context.label || '';
-                                return label + ': ' + value.toFixed(2) + ' kg CO₂e (' + context.parsed.toFixed(2) + '%)';
+                                if (label.startsWith('Transport:')) {
+                                    return 'Includes weight of coal carried';
+                                }
+                                return '';
                             }
                         }
                     }
@@ -398,7 +473,8 @@
                         pointBackgroundColor: 'rgba(33, 150, 243, 1)',
                         pointRadius: 6,
                         pointHoverRadius: 8,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        tension: 0.1
                     },
                     {
                         label: 'Estimated Emissions',
@@ -411,7 +487,8 @@
                         pointBackgroundColor: 'rgba(156, 39, 176, 0.7)',
                         pointRadius: 5,
                         pointHoverRadius: 7,
-                        pointStyle: 'triangle'
+                        pointStyle: 'triangle',
+                        tension: 0.1
                     }
                 ]
             },
@@ -450,7 +527,11 @@
                             display: true,
                             text: 'Carbon Emissions (tonnes CO₂e)'
                         },
-                        beginAtZero: false
+                        beginAtZero: false,
+                        ticks: {
+                            // Ensure we show enough ticks even with small datasets
+                            count: 6
+                        }
                     },
                     x: {
                         title: {
@@ -458,6 +539,10 @@
                             text: 'Financial Year'
                         }
                     }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
         });
@@ -480,38 +565,100 @@
             }
         });
         
-        // Update the footprint position text
+        // Update the footprint position text with the detailed assessment
         document.getElementById('footprint-position').textContent = 
             chartData.scaleChart.footprintPosition || "being calculated";
         
         // Create scale chart (horizontal bar with gradient and improved header)
         const scaleCtx = document.getElementById('scaleChart').getContext('2d');
         
-        // Create gradient
+        // Create gradient with reduced width (changed from 600 to 350)
         const gradient = scaleCtx.createLinearGradient(0, 0, 600, 0);
-        gradient.addColorStop(0, '#2ecc71');    // Green
-        gradient.addColorStop(0.25, '#a2d639'); // Light green
-        gradient.addColorStop(0.5, '#f1c40f');  // Yellow
-        gradient.addColorStop(0.75, '#e67e22'); // Orange
-        gradient.addColorStop(1, '#e74c3c');    // Red
+        gradient.addColorStop(0, '#2ecc71');    // Green - Low Impact
+        gradient.addColorStop(0.25, '#a2d639'); // Light green - Below Average
+        gradient.addColorStop(0.5, '#f1c40f');  // Yellow - Industry Average
+        gradient.addColorStop(0.75, '#e67e22'); // Orange - Above Average
+        gradient.addColorStop(1, '#e74c3c');    // Red - High Impact
         
-        // Calculate the normalized position of user's footprint (0-100)
+        // Get scale boundaries from the data
         const lowFootprint = chartData.scaleChart.lowFootprint;
+        const belowAvg = chartData.scaleChart.belowAvg;
+        const avgFootprint = chartData.scaleChart.avgFootprint;
+        const aboveAvg = chartData.scaleChart.aboveAvg;
         const highFootprint = chartData.scaleChart.highFootprint;
         const userFootprint = chartData.scaleChart.userFootprint;
         
-        // Clamp user's footprint to visible range with some buffer
-        const clampedUserFootprint = Math.min(Math.max(userFootprint, lowFootprint * 0.9), highFootprint * 1.1);
-        const normalizedPosition = ((clampedUserFootprint - lowFootprint) / (highFootprint - lowFootprint)) * 100;
+        // Create a logarithmic scale to handle wide range of values
+        const scaleMax = Math.max(highFootprint * 2, userFootprint * 1.5);
+        const scaleMin = Math.min(lowFootprint * 0.5, Math.max(1, userFootprint * 0.5));
         
-        // Create reference point markers
+        // Calculate the normalized position of user's footprint for visualization
+        // Using logarithmic scale to better visualize wide ranges
+        function normalizeLogScale(value) {
+            // Convert to log scale then normalize to 0-100
+            const logMin = Math.log10(scaleMin);
+            const logMax = Math.log10(scaleMax);
+            const logValue = Math.log10(Math.max(value, 1)); // Avoid log(0)
+            
+            return ((logValue - logMin) / (logMax - logMin)) * 100;
+        }
+        
+        const normalizedPosition = normalizeLogScale(userFootprint);
+        
+        // Create reference point markers for the scale chart
         const referencePoints = chartData.scaleChart.referencePoints || [
-            {value: lowFootprint, label: "Low Impact", description: "Excellent performance"},
-            {value: (lowFootprint + chartData.scaleChart.avgFootprint) / 2, label: "Below Average", description: "Good performance"},
-            {value: chartData.scaleChart.avgFootprint, label: "Industry Average", description: "Typical for the sector"},
-            {value: (highFootprint + chartData.scaleChart.avgFootprint) / 2, label: "Above Average", description: "Room for improvement"},
-            {value: highFootprint, label: "High Impact", description: "Significant improvement needed"}
+            {value: lowFootprint, label: "Low Impact", description: "Small mines with efficient operations"},
+            {value: belowAvg, label: "Below Average", description: "Moderate production with some emission controls"},
+            {value: avgFootprint, label: "Industry Average", description: "Typical medium-sized coal mine"},
+            {value: aboveAvg, label: "Above Average", description: "Larger mines with significant emissions"},
+            {value: highFootprint, label: "High Impact", description: "Major operations with limited emission controls"}
         ];
+        
+        // Create annotations for each reference point
+        const scaleAnnotations = {};
+        
+        // Add the user's position marker
+        scaleAnnotations.userPosition = {
+            type: 'line',
+            scaleID: 'x',
+            value: normalizedPosition,
+            borderColor: '#000000',
+            borderWidth: 3,
+            label: {
+                enabled: true,
+                position: 'top',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                color: '#ffffff',
+                content: ['YOUR MINE', `${userFootprint.toLocaleString()} tonnes CO₂e`],
+                font: {
+                    weight: 'bold',
+                    size: 12
+                }
+            }
+        };
+        
+        // Add reference markers
+        referencePoints.forEach((point, index) => {
+            const normValue = normalizeLogScale(point.value);
+            scaleAnnotations[`ref${index}`] = {
+                type: 'line',
+                scaleID: 'x',
+                value: normValue,
+                borderColor: 'rgba(100,100,100,0.5)',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                label: {
+                    enabled: true,
+                    position: 'bottom',
+                    backgroundColor: 'rgba(255,255,255,0.7)',
+                    color: '#333',
+                    content: [point.label, point.value.toLocaleString()],
+                    font: {
+                        size: 10
+                    }
+                }
+            };
+        });
         
         // Create a dummy dataset with a bar representing the scale range
         const scaleChart = new Chart(scaleCtx, {
@@ -522,7 +669,8 @@
                     label: 'Scale',
                     data: [100],
                     backgroundColor: gradient,
-                    barPercentage: 0.8,
+                    barPercentage: 0.15,  // Make the bar narrower
+                    borderRadius: 5,      // Rounded corners
                 }]
             },
             options: {
@@ -530,65 +678,33 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: false,
+                    annotation: {
+                        annotations: scaleAnnotations
                     },
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: false
-                    }
+                    legend: { display: false },
+                    tooltip: { enabled: false }
                 },
                 scales: {
                     x: {
                         min: 0,
                         max: 100,
-                        grid: {
-                            display: false
-                        },
+                        grid: { display: false },
                         ticks: {
-                            callback: function(value) {
-                                if (value === 0) return 'Low Impact';
-                                if (value === 25) return 'Below Average';
-                                if (value === 50) return 'Industry Average';
-                                if (value === 75) return 'Above Average';
-                                if (value === 100) return 'High Impact';
-                                return null;
+                            callback: function(v) {
+                                if (v === 0) return 'Low Impact';
+                                if (v === 25) return 'Below Avg';
+                                if (v === 50) return 'Industry Avg';
+                                if (v === 75) return 'Above Avg';
+                                if (v === 100) return 'High Impact';
                             },
-                            font: {
-                                weight: 'bold'
-                            }
+                            font: { weight: 'bold' }
                         }
                     },
-                    y: {
-                        display: false
-                    }
+                    y: { display: false }
                 }
             }
         });
         
-        // Add user's position marker manually since annotation plugin might not be available
-        scaleCtx.fillStyle = 'black';
-        const metaData = scaleChart.getDatasetMeta(0);
-        const rect = metaData.data[0].getProps(['x', 'y', 'width', 'height']);
-        
-        // Calculate position along the bar
-        const markerX = rect.x - rect.width/2 + (rect.width * normalizedPosition / 100);
-        const markerY = rect.y;
-        
-        scaleCtx.beginPath();
-        scaleCtx.moveTo(markerX, markerY - 15);
-        scaleCtx.lineTo(markerX - 10, markerY);
-        scaleCtx.lineTo(markerX + 10, markerY);
-        scaleCtx.closePath();
-        scaleCtx.fill();
-        
-        // Add text label
-        scaleCtx.fillStyle = 'black';
-        scaleCtx.textAlign = 'center';
-        scaleCtx.font = 'bold 14px Arial';
-        scaleCtx.fillText(`${userFootprint.toFixed(2)} tonnes`, markerX, markerY - 25);
     });
     </script>
 
@@ -645,17 +761,31 @@
             justify-content: center;
             align-items: center;
             min-height: 300px;
+            height: 350px;
             width: 100%;
             position: relative;
         }
 
         canvas {
             max-width: 100%;
-            max-height: 350px;
+            height: 100% !important;
         }
 
         .full-width {
             grid-column: 1 / -1; /* Span all columns */
+        }
+
+        /* New styles for scale chart with reduced width */
+        .scale-container {
+            max-width: 100%;
+            margin: 0 auto 20px;
+            grid-column: 1 / -1;
+        }
+        
+        @media (max-width: 768px) {
+            .scale-container {
+                max-width: 90%;
+            }
         }
 
         /* New styles for scale visualization */

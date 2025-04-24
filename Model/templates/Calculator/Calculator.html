@@ -158,6 +158,7 @@
                 </div>
                 
                 <!-- Explosives Section -->
+                <h3>Explosives</h3>
                 <div class="explosives-container">
                     {% if explosives %}
                         {% for explosive in explosives %}
@@ -187,6 +188,12 @@
                                    name="transport_{{ transport.id }}_distance" step="0.01"
                                    placeholder="Enter distance (km)" class="transport-input"
                                    value="{{ transport_data|get_dict_item:transport.id }}">
+                            <label for="transport_{{ transport.id }}_weight" style="margin-left:10px;">Weight carried (tonnes)</label>
+                            <input type="number" id="transport_{{ transport.id }}_weight"
+                                   name="transport_{{ transport.id }}_weight" step="0.01"
+                                   placeholder="Enter weight (tonnes)"
+                                   class="transport-weight-input"
+                                   value="{{ transport_weight_data|get_dict_item:transport.id }}">
                         </div>
                         {% endfor %}
                     {% else %}

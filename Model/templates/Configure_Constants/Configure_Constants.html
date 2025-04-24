@@ -138,27 +138,11 @@
                 </div>
                 
                 <div id="carbon-stock-methane" style="display: none;">
-                    <h3>iv) Carbon Stock Loss - Methane Emission Factor</h3>
+                    <h3>iv) Methane Emission Factor</h3>
                     <div class="sub-fields">
-                        <div class="sub-field-pair anthracite-ch4">
-                            <label for="anthracite_ch4">Anthracite</label>
-                            {{ form.anthracite_ch4 }}
-                        </div>
-                        <div class="sub-field-pair">
-                            <label for="bituminous_c_ch4">Bituminous (Coking)</label>
-                            {{ form.bituminous_c_ch4 }}
-                        </div>
-                        <div class="sub-field-pair">
-                            <label for="bituminous_nc_ch4">Bituminous (Non-Coking)</label>
-                            {{ form.bituminous_nc_ch4 }}
-                        </div>
-                        <div class="sub-field-pair">
-                            <label for="subbituminous_ch4">Subbituminous</label>
-                            {{ form.subbituminous_ch4 }}
-                        </div>
-                        <div class="sub-field-pair">
-                            <label for="lignite_ch4">Lignite</label>
-                            {{ form.lignite_ch4 }}
+                        <div class="sub-field-single">
+                            <label for="methane_emission_factor">Methane Emission Factor (kg CH₄/GJ)</label>
+                            {{ form.methane_emission_factor }}
                         </div>
                     </div>
                 </div>
@@ -299,11 +283,17 @@
                 </div>
             </div>
             
-            <button type="submit" class="button">Save Constants</button>
-            <a href="javascript:history.back()" class="button back-button">
-                <span class="button-icon">←</span>
-                <span class="button-text">Back</span>
-            </a>
+
+            <!-- Add hidden input to specify redirect destination -->
+            <input type="hidden" name="redirect_to" value="{% url 'Model:Calculator' %}">
+            
+            <div class="button-group">
+                <button type="submit" class="button">Save Constants & Return to Calculator</button>
+                <a href="javascript:history.back()" class="button back-button">
+                    <span class="button-icon">←</span>
+                    <span class="button-text">Back</span>
+                </a>
+            </div>
         </form>
     </div>
     

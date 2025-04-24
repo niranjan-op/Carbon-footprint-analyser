@@ -78,4 +78,65 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.print-button').addEventListener('click', function() {
         window.print();
     });
+    
+    // Add this function to debug chart visibility
+    function debugChartContainers() {
+        const containers = document.querySelectorAll('.vis-container');
+        
+        containers.forEach((container, index) => {
+            console.log(`Chart container ${index} dimensions:`, {
+                width: container.offsetWidth,
+                height: container.offsetHeight,
+                visibility: window.getComputedStyle(container).visibility,
+                display: window.getComputedStyle(container).display
+            });
+            
+            const canvas = container.querySelector('canvas');
+            if (canvas) {
+                console.log(`Canvas ${index} dimensions:`, {
+                    width: canvas.width,
+                    height: canvas.height,
+                    style_width: canvas.style.width,
+                    style_height: canvas.style.height,
+                    visibility: window.getComputedStyle(canvas).visibility
+                });
+            } else {
+                console.log(`No canvas found in container ${index}`);
+            }
+        });
+    }
+    
+    // Call once when page loads
+    setTimeout(debugChartContainers, 1000);
+    
+    // Force Chart.js to properly resize charts when window size changes
+    window.addEventListener('resize', function() {
+        const charts = Object.values(Chart.instances);
+        charts.forEach(chart => {
+            try {
+                chart.resize();
+            } catch (e) {
+                console.error('Error resizing chart:', e);
+            }
+        });
+        
+        // Debug after resize
+        setTimeout(debugChartContainers, 500);
+    });
+    
+    // Ensure chart containers are visible
+    function ensureChartsVisible() {
+        const visContainers = document.querySelectorAll('.vis-container');
+        visContainers.forEach(container => {
+            if (container.offsetHeight < 200) {
+                container.style.minHeight = '300px';
+                container.style.height = '350px';
+            }
+        });
+    }
+    
+    // Call multiple times to ensure charts render properly
+    setTimeout(ensureChartsVisible, 100);
+    setTimeout(ensureChartsVisible, 500);
+    setTimeout(ensureChartsVisible, 1000);
 });

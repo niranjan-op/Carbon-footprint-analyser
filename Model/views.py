@@ -30,31 +30,31 @@ def Calculator(request):
     financial_year = request.GET.get('financial_year')
     past_emission = None
     
-    if financial_year:
+    if (financial_year):
         # Load the past emission data for editing/viewing - filter by both financial_year and user
-        if request.user.is_authenticated:
+        if (request.user.is_authenticated):
             past_emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
         else:
             # For anonymous users
             past_emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=None)
             
         # Check if the user owns this emission data (redundant but kept for safety)
-        if request.user.is_authenticated and past_emission.user != request.user:
+        if (request.user.is_authenticated and past_emission.user != request.user):
             messages.error(request, "You don't have permission to view this project.")
             return redirect('Model:Calculator')
     
     # Get the most recent constants set, or create default if none exists
     constants = None
-    if request.user.is_authenticated:
+    if (request.user.is_authenticated):
         # Try to get user's constants
         constants = Constants.objects.filter(user=request.user).order_by('-updated_at').first()
     
     # If no user constants (or user not authenticated), try system defaults
-    if constants is None:
+    if (constants is None):
         constants = Constants.objects.filter(user=None).order_by('-updated_at').first()
         
     # If still no constants, create a new default one
-    if constants is None:
+    if (constants is None):
         constants = Constants(name="Default Constants")
         constants.save()
         
@@ -68,15 +68,15 @@ def Calculator(request):
     
     # Initialize form with past project data if available
     initial_data = {}
-    if past_emission:
+    if (past_emission):
         # Get values from the past emission to prefill the form
         for field in CalculatorForm.Meta.fields:
-            if field != 'mine_type':  # Skip mine_type as it's not in the model
-                if hasattr(past_emission, field):
+            if (field != 'mine_type'):  # Skip mine_type as it's not in the model
+                if (hasattr(past_emission, field)):
                     initial_data[field] = getattr(past_emission, field)
         
         # Determine mine_type based on data in the emission
-        if past_emission.total_ch4 > 0:
+        if (past_emission.total_ch4 > 0):
             initial_data['mine_type'] = 'underground'
         else:
             initial_data['mine_type'] = 'open_cast'
@@ -92,7 +92,8 @@ def Calculator(request):
     # Prepare data for pre-filling explosive and transport fields
     explosive_data = {}
     transport_data = {}
-    
+    transport_weight_data = {}  # New: for pre-filling weights
+
     # Define context here so it's available throughout the function
     context = {
         'form': form,
@@ -102,59 +103,69 @@ def Calculator(request):
         'past_emission': past_emission,
         'explosive_data': explosive_data,
         'transport_data': transport_data,
+        'transport_weight_data': transport_weight_data,  # New
     }
     
-    if past_emission:
+    if (past_emission):
         # Debug: Print what's in the emission
         print(f"Loading data for emission: {past_emission.financial_year}")
         
         try:
             # Check if meta_data attribute exists and has the required data
-            if hasattr(past_emission, '_meta_data') and past_emission._meta_data:
+            if (hasattr(past_emission, '_meta_data') and past_emission._meta_data):
                 meta_data = past_emission.meta_data
                 print(f"Meta data from emission: {meta_data}")
                 
                 # Check for explosives data in meta_data
-                if 'explosive_amounts' in meta_data and meta_data['explosive_amounts']:
+                if ('explosive_amounts' in meta_data and meta_data['explosive_amounts']):
                     explosive_data = meta_data['explosive_amounts']
                     print(f"Explosive data from meta_data: {explosive_data}")
                 
                 # Check for transport data in meta_data
-                if 'transport_distances' in meta_data and meta_data['transport_distances']:
+                if ('transport_distances' in meta_data and meta_data['transport_distances']):
                     transport_data = meta_data['transport_distances']
                     print(f"Transport data from meta_data: {transport_data}")
+                
+                # Check for transport weights in meta_data
+                if 'transport_weights' in meta_data and meta_data['transport_weights']:
+                    transport_weight_data = meta_data['transport_weights']
             else:
                 print("No meta_data found in emission object")
         except Exception as e:
             print(f"Error accessing meta_data: {e}")
             
         # Fall back to session if meta_data didn't provide the values
-        if not explosive_data:
+        if (not explosive_data):
             session_explosives = request.session.get(f'explosive_details_{past_emission.financial_year}', {})
-            if session_explosives:
+            if (session_explosives):
                 print(f"Using explosive data from session: {session_explosives}")
                 explosive_data = session_explosives
-            elif past_emission.explosives_used > 0 and explosives.exists():
+            elif (past_emission.explosives_used > 0 and explosives.exists()):
                 print(f"Distributing {past_emission.explosives_used} kg explosives evenly among {explosives.count()} types")
                 amount_per_explosive = past_emission.explosives_used / explosives.count()
                 for explosive in explosives:
                     explosive_data[str(explosive.id)] = amount_per_explosive
             
-        if not transport_data:
+        if (not transport_data):
             session_transports = request.session.get(f'transport_details_{past_emission.financial_year}', {})
-            if session_transports:
+            if (session_transports):
                 print(f"Using transport data from session: {session_transports}")
                 transport_data = session_transports
-            elif past_emission.transport_distance > 0 and transports.exists():
+            elif (past_emission.transport_distance > 0 and transports.exists()):
                 print(f"Distributing {past_emission.transport_distance} km evenly among {transports.count()} types")
                 distance_per_transport = past_emission.transport_distance / transports.count()
                 for transport in transports:
                     transport_data[str(transport.id)] = distance_per_transport
+
+        if not transport_weight_data:
+            session_weights = request.session.get(f'transport_weights_{past_emission.financial_year}', {})
+            if session_weights:
+                transport_weight_data = session_weights
     
     # Add explosives and transport fields dynamically
-    if request.method == 'POST':
+    if (request.method == 'POST'):
         form = CalculatorForm(request.POST)
-        if form.is_valid():
+        if (form.is_valid()):
             # Validate financial_year explicitly
             financial_year = request.POST.get('financial_year')
             try:
@@ -166,24 +177,24 @@ def Calculator(request):
                 return render(request, 'Calculator/Calculator.html', context)
             
             # Check if we're updating an existing project or creating a new one
-            if past_emission:
+            if (past_emission):
                 # Update existing emission object
                 emission = past_emission
                 
                 # Update fields from the form
                 for field in form.cleaned_data:
-                    if field != 'mine_type':  # Skip mine_type as it's not in the model
+                    if (field != 'mine_type'):  # Skip mine_type as it's not in the model
                         setattr(emission, field, form.cleaned_data[field])
             else:
                 # Create a new emission object
                 emission = form.save(commit=False)
                 
                 # Set financial_year if not editing
-                if financial_year:
+                if (financial_year):
                     emission.financial_year = financial_year
             
             # Common processing for both new and existing emissions
-            if request.user.is_authenticated:
+            if (request.user.is_authenticated):
                 emission.user = request.user
                 
             emission.constants = constants
@@ -198,7 +209,7 @@ def Calculator(request):
             
             for explosive in explosives:
                 amount_field_name = f'explosive_{explosive.id}_amount'
-                if amount_field_name in request.POST and request.POST[amount_field_name]:
+                if (amount_field_name in request.POST and request.POST[amount_field_name]):
                     amount = float(request.POST[amount_field_name])
                     total_explosives_used += amount
                     explosive_details[str(explosive.id)] = amount
@@ -213,22 +224,31 @@ def Calculator(request):
             total_transport_emissions = 0
             total_transport_distance = 0
             transport_details = {}
-            
+            transport_weights = {}
+
             for transport in transports:
                 distance_field_name = f'transport_{transport.id}_distance'
+                weight_field_name = f'transport_{transport.id}_weight'
                 if distance_field_name in request.POST and request.POST[distance_field_name]:
                     distance = float(request.POST[distance_field_name])
                     total_transport_distance += distance
                     transport_details[str(transport.id)] = distance
-                    # Calculate emissions: distance * emission_factor
-                    total_transport_emissions += distance * transport.emission_factor
-            
+                    # Get weight for this transport (default to 1 if not provided)
+                    weight = 1.0
+                    if weight_field_name in request.POST and request.POST[weight_field_name]:
+                        weight = float(request.POST[weight_field_name])
+                    transport_weights[str(transport.id)] = weight
+                    # Calculate emissions: distance * emission_factor * weight
+                    total_transport_emissions += distance * transport.emission_factor * weight
+
             # Save total transport distance
             emission.transport_distance = total_transport_distance
             emission.transport_emissions = total_transport_emissions
+            # Save transport weights as JSON
+            emission.transport_weights_dict = transport_weights
 
             # Process project name from the form
-            if 'financial_year' in request.POST and request.POST['financial_year']:
+            if ('financial_year' in request.POST and request.POST['financial_year']):
                 emission.financial_year = request.POST['financial_year']
             
             carbon_prod = [emission.anthracite, emission.bituminous_coking, emission.bituminous_non_coking, 
@@ -242,7 +262,7 @@ def Calculator(request):
                 emission.total_ch4, emission.waste, total_explosives_used, total_transport_distance
             ])
             
-            if all_zeros:
+            if (all_zeros):
                 # If all inputs are zero, carbon footprint should be zero
                 Carbon_footprint = 0
                 print("All inputs are zero, setting Carbon_footprint to zero")
@@ -261,23 +281,26 @@ def Calculator(request):
                 Carbon_footprint = Carbon_Production(constants.exclusion_fact, carbon_prod, carbon_content, coal_type_conv, cof)
                 print("Initial Carbon_footprint after Carbon_Production:", Carbon_footprint)
 
-                if mine_type == 'open_cast':
+                if (mine_type == 'open_cast'):
                     Carbon_footprint += np.multiply(emission.overburden_removed, constants.overburden_ef)
                     print("After overburden:", Carbon_footprint)
                     Carbon_footprint += np.multiply(emission.land_disturbance, constants.csl)
                     print("After land disturbance:", Carbon_footprint)
-                elif mine_type == 'underground':
+                elif (mine_type == 'underground'):
                     Carbon_footprint += np.multiply(np.multiply(emission.total_ch4, 0.00067), 25)
                     print("After methane:", Carbon_footprint)
 
                 # Equipment and Fuel Emissions:
-                Carbon_footprint += FuelEmissions(constants.diesel_ef, emission.diesel_used)
+                emission.diesel_emissions = FuelEmissions(constants.diesel_ef, emission.diesel_used)
+                Carbon_footprint += emission.diesel_emissions
                 print("After diesel:", Carbon_footprint)
-                Carbon_footprint += FuelEmissions(constants.petrol_ef, emission.petrol_used)
+                emission.petrol_emissions = FuelEmissions(constants.petrol_ef, emission.petrol_used)
+                Carbon_footprint += emission.petrol_emissions
                 print("After petrol:", Carbon_footprint)
 
                 # Electricity Emissions:
-                Carbon_footprint += ElecEmissions(emission.electricity_used, constants.grid_emission_factor)
+                emission.electricity_emissions = ElecEmissions(emission.electricity_used, constants.grid_emission_factor)
+                Carbon_footprint += emission.electricity_emissions
                 print("After electricity:", Carbon_footprint)
 
                 # Waste:
@@ -293,19 +316,21 @@ def Calculator(request):
             emission.Carbon_footprint = Carbon_footprint
 
             # Save the emission record if user is authenticated
-            if request.user.is_authenticated:
+            if (request.user.is_authenticated):
                 emission.save()  # Save first to get an ID
                 
                 # Store in meta_data
                 meta_data = emission.meta_data or {}
                 meta_data['explosive_amounts'] = explosive_details
                 meta_data['transport_distances'] = transport_details
+                meta_data['transport_weights'] = transport_weights  # New
                 emission.meta_data = meta_data
                 emission.save()  # Save again with meta_data
                 
                 # Also store in session as backup
                 request.session[f'explosive_details_{emission.financial_year}'] = explosive_details
                 request.session[f'transport_details_{emission.financial_year}'] = transport_details
+                request.session[f'transport_weights_{emission.financial_year}'] = transport_weights  # New
                 
                 messages.success(request, "Calculation completed successfully.")
                 return redirect('Model:Results', financial_year=emission.financial_year)
@@ -330,28 +355,61 @@ def Configure_Constants(request):
     emission_id = None
     
     # Check if there's a emission_id in the query string if coming from a results page
-    if 'emission_id' in request.GET:
+    if ('emission_id' in request.GET):
         emission_id = request.GET.get('emission_id')
     
     # Check if there are saved constants for this user
     user_constants = None
-    if request.user.is_authenticated:
+    if (request.user.is_authenticated):
         user_constants = Constants.objects.filter(user=request.user).order_by('-updated_at').first()
     
-    if user_constants is None:
+    if (user_constants is None):
         # If no user-specific constants, start with system defaults
         user_constants = Constants.objects.filter(user=None).order_by('-updated_at').first()
-        if user_constants is None:
+        if (user_constants is None):
             # If no system defaults either, create a new one
             user_constants = Constants(name="Default Constants")
     
-    if request.method == "POST":
+    if (request.method == "POST"):
+        print("\n=== Constants Form Submission ===")
+        print(f"POST data received: {request.POST}")
+        print(f"Files: {request.FILES}")
+        print(f"User: {request.user}")
+        print(f"Emission ID: {emission_id}")
+        
+        # First initialize the form with the original POST data
         form = Configure_Constants_Input(request.POST, instance=user_constants)
         
-        if form.is_valid():
+        # Check for missing required fields
+        for field_name, field in form.fields.items():
+            if field.required and field_name not in request.POST:
+                print(f"ERROR: Missing required field: {field_name}")
+            elif field_name in request.POST and not request.POST[field_name]:
+                print(f"WARNING: Empty value for field: {field_name}")
+        
+        # Check for redirect_to field
+        if 'redirect_to' not in request.POST:
+            print("WARNING: Missing redirect_to field")
+        else:
+            print(f"Redirect target: {request.POST.get('redirect_to')}")
+        
+        # Handle form submission data - create a modified version if needed
+        post_data = request.POST.copy()  # Make a mutable copy of the POST data
+        
+        # If mine type is open-cast and methane_emission_factor is missing/empty, add a default value
+        if post_data.get('mine_type') == 'open-cast' and (
+            'methane_emission_factor' not in post_data or not post_data['methane_emission_factor']):
+            post_data['methane_emission_factor'] = '0.00067'
+            print("Added default methane_emission_factor for open-cast mine")
+            # Create a new form with the modified data
+            form = Configure_Constants_Input(post_data, instance=user_constants)
+        
+        print(f"Form before validation: {form.is_bound}")
+        
+        if (form.is_valid()):
             constants = form.save(commit=False)
             
-            if request.user.is_authenticated:
+            if (request.user.is_authenticated):
                 constants.user = request.user
                 constants.name = f"{request.user.username}'s Constants"
             
@@ -369,10 +427,10 @@ def Configure_Constants(request):
                 explosive_type = request.POST.get(f'explosive-type-{i}')
                 emission_factor = request.POST.get(f'explosive-emission-{i}')
                 
-                if explosive_type and emission_factor:
+                if (explosive_type and emission_factor):
                     try:
                         # If we have an existing record at this index, update it
-                        if i <= existing_count:
+                        if (i <= existing_count):
                             explosive = existing_explosives[i-1]
                             explosive.explosive_type = explosive_type
                             explosive.emission_factor = float(emission_factor)
@@ -404,10 +462,10 @@ def Configure_Constants(request):
                 transport_type = request.POST.get(f'transport-type-{i}')
                 emission_factor = request.POST.get(f'transport-emission-{i}')
                 
-                if transport_type and emission_factor:
+                if (transport_type and emission_factor):
                     try:
                         # If we have an existing record at this index, update it
-                        if i <= existing_transport_count:
+                        if (i <= existing_transport_count):
                             transport = existing_transports[i-1]
                             transport.transport_type = transport_type
                             transport.emission_factor = float(emission_factor)
@@ -430,7 +488,7 @@ def Configure_Constants(request):
             messages.success(request, "Constants saved successfully!")
             
             # If coming from a specific emission page, redirect back there
-            if emission_id:
+            if (emission_id):
                 # Update to use financial_year instead of emission_id
                 return redirect('Model:Results', financial_year=emission_id)
             else:
@@ -459,7 +517,7 @@ def Configure_Constants(request):
 
 def Results(request, financial_year):
     # Find emission by both financial_year and user to avoid getting multiple results
-    if request.user.is_authenticated:
+    if (request.user.is_authenticated):
         emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
     else:
         # For anonymous users, just try to get by financial_year
@@ -468,289 +526,148 @@ def Results(request, financial_year):
     # Create data for Chart.js
     chart_data = {}
     
-    # 1. Create pie chart data
+    # --- Transport breakdown for pie chart ---
+    transport_breakdown = {}
+    if emission.transport_weights:
+        try:
+            transport_weights = emission.transport_weights_dict
+            transport_distances = {}
+            if hasattr(emission, 'meta_data') and emission.meta_data.get('transport_distances'):
+                transport_distances = emission.meta_data.get('transport_distances')
+            else:
+                transport_distances = {}
+
+            for transport in emission.constants.transports.all():
+                tid = str(transport.id)
+                distance = float(transport_distances.get(tid, 0))
+                weight = float(transport_weights.get(tid, 0))
+                emission_val = distance * transport.emission_factor * weight
+                if emission_val > 0:
+                    transport_breakdown[transport.transport_type] = emission_val
+        except Exception as e:
+            print(f"Error in transport breakdown: {e}")
+
+    # --- Pie chart data ---
     categories_data = {
-        'Transport': emission.transport_emissions,
         'Explosives': emission.explosive_emissions,
         'Electricity': emission.electricity_used * emission.constants.grid_emission_factor if hasattr(emission, 'constants') else 0,
         'Diesel': emission.diesel_used * emission.constants.diesel_ef if hasattr(emission, 'constants') else 0,
         'Petrol': emission.petrol_used * emission.constants.petrol_ef if hasattr(emission, 'constants') else 0,
         'Waste': emission.waste * emission.constants.waste_ef if hasattr(emission, 'constants') else 0,
-        'Coal Production': emission.Carbon_footprint - emission.transport_emissions - emission.explosive_emissions - 
-                          (emission.electricity_used * emission.constants.grid_emission_factor if hasattr(emission, 'constants') else 0) -
-                          (emission.diesel_used * emission.constants.diesel_ef if hasattr(emission, 'constants') else 0) -
-                          (emission.petrol_used * emission.constants.petrol_ef if hasattr(emission, 'constants') else 0) -
-                          (emission.waste * emission.constants.waste_ef if hasattr(emission, 'constants') else 0)
+        'Coal Production': emission.Carbon_footprint
+            - sum(transport_breakdown.values())
+            - emission.explosive_emissions
+            - (emission.electricity_used * emission.constants.grid_emission_factor if hasattr(emission, 'constants') else 0)
+            - (emission.diesel_used * emission.constants.diesel_ef if hasattr(emission, 'constants') else 0)
+            - (emission.petrol_used * emission.constants.petrol_ef if hasattr(emission, 'constants') else 0)
+            - (emission.waste * emission.constants.waste_ef if hasattr(emission, 'constants') else 0)
     }
-    
-    # Filter out categories with zero values
+    # Add each transport type as a separate slice
+    for ttype, tval in transport_breakdown.items():
+        categories_data[f"Transport: {ttype}"] = tval
+
+    # Remove 'Transport' key if present (old code)
+    categories_data.pop('Transport', None)
+
+    # Filter out categories with zero or negative values
     categories_data = {k: v for k, v in categories_data.items() if v > 0}
-    
-    # Prepare pie chart data for Chart.js
+
     chart_data['pieChart'] = {
         'labels': list(categories_data.keys()),
         'values': list(categories_data.values())
     }
     
-    # 2. Create historical trend line chart data
-    # Get the current fiscal year
+    # --- Line graph (trend) data ---
     current_year = int(emission.financial_year.split('-')[0])
-    
-    # Create list of years for the past 5 years (including current)
     years_to_fetch = [f"{year}-{year+1}" for year in range(current_year-4, current_year+1)]
-    
-    # Initialize historical data dictionary
     historical_data = {}
-    
-    # First, try to get actual historical data if user is authenticated
+
     if request.user.is_authenticated:
-        # Fetch historical emissions for this user within the date range
         historical_emissions = CarbonEmission.objects.filter(
             user=request.user,
             financial_year__in=years_to_fetch
         ).order_by('financial_year')
-        
-        # Populate the dictionary with actual data
         for hist_emission in historical_emissions:
             historical_data[hist_emission.financial_year] = hist_emission.Carbon_footprint
-    
-    # Prepare trend chart data - use actual where available, mock where not
+
     trend_years = []
     trend_values = []
-    
-    # Base emission for mock data if needed
     base_emission = emission.Carbon_footprint
-    
-    # For each year in our 5-year window
+
     for year_str in years_to_fetch:
         trend_years.append(year_str)
-        
         if year_str in historical_data:
-            # Use actual data when available
             trend_values.append(historical_data[year_str])
-            print(f"Using actual data for {year_str}: {historical_data[year_str]}")
         else:
-            # Generate mock data for missing years
-            # Calculate relative year position (0 = 4 years ago, 4 = current year)
-            year_position = years_to_fetch.index(year_str)
-            
-            # Generate somewhat realistic mock data (showing improvement trend)
-            mock_factor = 1.3 - (year_position * 0.075) + random.uniform(-0.1, 0.1)
-            mock_value = base_emission * mock_factor
-            
-            trend_values.append(mock_value)
-            print(f"Using mock data for {year_str}: {mock_value} (factor: {mock_factor})")
-    
-    # Prepare trend chart data for Chart.js
+            # Estimate based on current emission with some variation
+            variation = 0.05  # 5% variation
+            year_diff = int(year_str.split('-')[0]) - current_year
+            if year_diff < 0:
+                # Past years (hypothetical) - slightly higher emissions (less efficiency)
+                factor = 1 + (abs(year_diff) * variation)
+                trend_values.append(base_emission * factor)
+            else:
+                # Future years (projected) - slightly lower emissions (more efficiency)
+                factor = 1 - (abs(year_diff) * variation)
+                trend_values.append(base_emission * factor)
+
     chart_data['trendChart'] = {
         'years': trend_years,
         'values': trend_values,
-        'is_actual': [year in historical_data for year in trend_years]  # Flag for actual vs mock data
+        'is_actual': [year in historical_data for year in trend_years]
     }
     
-    # 3. Carbon footprint scale visualization data with improved context
+    # Carbon footprint scale data with industry benchmarks
     # Define reference values for the scale with descriptive labels
-    low_footprint = 1000  # Example value for "green" level
-    avg_footprint = 5000  # Example average value
-    high_footprint = 10000  # Example value for "red" level
+    low_footprint = 100000  # Low Impact: Less than 100,000 tonnes CO₂e per year
+    below_avg = 250000  # Below Average: 100,000 to 250,000 tonnes CO₂e per year
+    avg_footprint = 500000  # Industry Average: 250,000 to 500,000 tonnes CO₂e per year
+    above_avg = 1000000  # Above Average: 500,000 to 1,000,000 tonnes CO₂e per year
+    high_footprint = 1000000  # High Impact: Over 1,000,000 tonnes CO₂e per year
     
-    # Create reference points for better understanding
+    # User's footprint value
+    user_footprint = emission.Carbon_footprint
+    
+    # Determine where the footprint falls on the scale
+    if user_footprint < low_footprint:
+        footprint_position = "in the Low Impact range - better than most coal mines"
+    elif user_footprint < below_avg:
+        footprint_position = "in the Below Average range - better than industry average"
+    elif user_footprint < avg_footprint:
+        footprint_position = "at the Industry Average level"
+    elif user_footprint < above_avg:
+        footprint_position = "in the Above Average range - higher than most mines"
+    else:
+        footprint_position = "in the High Impact range - significantly higher than industry standards"
+    
+    # Create reference points for better understanding of the scale
     reference_points = [
-        {"value": low_footprint, "label": "Low Impact", "description": "Excellent performance"},
-        {"value": 2500, "label": "Below Average", "description": "Good performance"},
-        {"value": avg_footprint, "label": "Industry Average", "description": "Typical for the sector"},
-        {"value": 7500, "label": "Above Average", "description": "Room for improvement"},
-        {"value": high_footprint, "label": "High Impact", "description": "Significant improvement needed"}
+        {"value": low_footprint, "label": "Low Impact", "description": "Small mines with efficient operations"},
+        {"value": below_avg, "label": "Below Average", "description": "Moderate production with some emission controls"},
+        {"value": avg_footprint, "label": "Industry Average", "description": "Typical medium-sized coal mine"},
+        {"value": above_avg, "label": "Above Average", "description": "Larger mines with significant emissions"},
+        {"value": high_footprint * 1.5, "label": "High Impact", "description": "Major operations with limited emission controls"}
     ]
     
-    # Calculate where the user's footprint falls in comparison
-    user_footprint = emission.Carbon_footprint
-    footprint_position = ""
-    
-    if user_footprint < low_footprint:
-        footprint_position = "Exceptionally Low Impact"
-    elif user_footprint < avg_footprint:
-        footprint_position = "Below Average Impact"
-    elif user_footprint < high_footprint:
-        footprint_position = "Above Average Impact"
-    else:
-        footprint_position = "High Impact"
-    
-    # Prepare scale chart data for Chart.js with improved context
     chart_data['scaleChart'] = {
         'lowFootprint': low_footprint,
-        'avgFootprint': avg_footprint, 
+        'belowAvg': below_avg,
+        'avgFootprint': avg_footprint,
+        'aboveAvg': above_avg,
         'highFootprint': high_footprint,
         'userFootprint': user_footprint,
         'footprintPosition': footprint_position,
         'referencePoints': reference_points
     }
     
-    # Convert chart data to JSON for the template
+    # Convert chart_data to JSON for the template
+    import json
     chart_data_json = json.dumps(chart_data)
     
-    # Still generate the static images with matplotlib as a fallback
-    # Create a directory to store the generated plots if it doesn't exist
-    plots_dir = os.path.join(settings.MEDIA_ROOT, 'emission_plots')
-    if not os.path.exists(plots_dir):
-        os.makedirs(plots_dir)
-    
-    # Generate unique identifiers for the plots
-    uid = f"{financial_year}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-    
-    # 1. Generate pie chart of emission categories
-    plt.figure(figsize=(10, 6))
-    if categories_data:  # Only create the pie chart if there's data
-        labels = list(categories_data.keys())
-        sizes = list(categories_data.values())
-        
-        # Use a colorful palette
-        colors = plt.cm.tab10(range(len(labels)))
-        
-        plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
-        plt.axis('equal')  # Equal aspect ratio ensures the pie chart is circular
-        plt.title(f'Carbon Emission Sources - {emission.financial_year}')
-    else:
-        plt.text(0.5, 0.5, 'No emission data available', horizontalalignment='center', verticalalignment='center')
-    
-    # Save the plot to a file
-    pie_chart_path = os.path.join(plots_dir, f'pie_chart_{uid}.png')
-    plt.savefig(pie_chart_path)
-    plt.close()
-    
-    # 2. Generate trend chart
-    plt.figure(figsize=(12, 6))
-    plt.plot(trend_years, trend_values, 'o-', linewidth=2, markersize=8, color='#1f77b4')
-    plt.title(f'Carbon Emissions Trend (Past 5 Years)')
-    plt.xlabel('Financial Year')
-    plt.ylabel('Carbon Emissions (tonnes CO2e)')
-    plt.grid(True, linestyle='--', alpha=0.7)
-    plt.xticks(rotation=45)
-    
-    # Distinguish between actual and estimated data
-    is_actual = chart_data['trendChart']['is_actual']
-    for i, (year, value) in enumerate(zip(trend_years, trend_values)):
-        marker_style = 'o' if is_actual[i] else '^'  # Circle for actual, triangle for estimated
-        marker_color = '#1f77b4' if is_actual[i] else '#9467bd'
-        plt.plot(year, value, marker_style, markersize=8, markerfacecolor=marker_color)
-        
-    # Highlight current year
-    plt.plot(trend_years[-1], trend_values[-1], 'o', markersize=10, markerfacecolor='red')
-    
-    # Add text annotations
-    for i, (year, value) in enumerate(zip(trend_years, trend_values)):
-        label = f"{value:.1f}"
-        plt.annotate(
-            label, 
-            (year, value),
-            textcoords="offset points",
-            xytext=(0, 10),
-            ha='center'
-        )
-    
-    # Add legend to distinguish actual vs estimated data
-    plt.plot([], [], 'o', color='#1f77b4', label='Actual Data')
-    plt.plot([], [], '^', color='#9467bd', label='Estimated Data')
-    plt.plot([], [], 'o', color='red', label='Current Year')
-    plt.legend(loc='best')
-    
-    plt.tight_layout()
-    trend_chart_path = os.path.join(plots_dir, f'trend_chart_{uid}.png')
-    plt.savefig(trend_chart_path)
-    plt.close()
-    
-    # 3. Carbon footprint scale visualization
-    plt.figure(figsize=(12, 4))  # Increased height for more space
-    
-    # Create gradient colormap
-    cmap = mcolors.LinearSegmentedColormap.from_list("", ["green", "yellow", "red"])
-    norm = mcolors.Normalize(low_footprint, high_footprint)
-    
-    # Create a properly configured ScalarMappable for the colorbar
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])  # Set an empty array to make the ScalarMappable work
-    
-    # Get the current axes and create colorbar with it
-    ax = plt.gca()
-    cb = plt.colorbar(sm, ax=ax, orientation='horizontal', 
-                     ticks=[low_footprint, 2500, avg_footprint, 7500, high_footprint])
-    cb.set_label('Carbon Footprint Scale (tonnes CO₂e)', fontsize=12)
-    cb.set_ticklabels(['Low Impact', 'Below Average', 'Industry Average', 'Above Average', 'High Impact'])
-    
-    # Mark user's position on the scale
-    user_position = min(max(user_footprint, low_footprint*0.9), high_footprint*1.1)
-    normalized_position = (user_position - low_footprint) / (high_footprint - low_footprint)
-    
-    # Convert normalized position to data coordinates
-    ax_xmin, ax_xmax = ax.get_xlim()
-    data_position = ax_xmin + normalized_position * (ax_xmax - ax_xmin)
-    
-    # Add a prominent arrow pointing to the user's position on the scale
-    arrow_y_start = 1.5  # Start position for the arrow (above the colorbar)
-    arrow_y_end = 0.8    # End position for the arrow (pointing to the colorbar)
-    
-    # Create a larger, more visible arrow
-    plt.annotate('', 
-                xy=(data_position, arrow_y_end),      # Arrow tip at user position
-                xytext=(data_position, arrow_y_start),# Arrow base above
-                arrowprops=dict(
-                    facecolor='black',
-                    shrink=0.05,
-                    width=4,
-                    headwidth=15,
-                    headlength=12
-                ),
-                annotation_clip=False
-               )
-               
-    # Add a triangular pointer directly on top of the scale
-    pointer_height = 0.3
-    triangle_x = [data_position - pointer_height/2, data_position, data_position + pointer_height/2]
-    triangle_y = [0.1, 0.4, 0.1]  # Position directly over the color bar
-    plt.fill(triangle_x, triangle_y, color='black')
-    
-    # Add a small circle inside the triangle for better visibility
-    plt.plot(data_position, 0.25, 'o', markersize=6, color='white')
-    
-    # Add "YOU ARE HERE" text above the arrow
-    plt.text(data_position, arrow_y_start + 0.3, 'YOU ARE HERE', 
-             ha='center', va='bottom', fontweight='bold', fontsize=16, color='black',
-             bbox=dict(facecolor='white', alpha=0.9, edgecolor='black', boxstyle='round,pad=0.5'))
-    
-    # Add a circular marker at the position for extra visibility
-    plt.plot(data_position, arrow_y_end, 'o', markersize=12, color='black')
-    
-    # Plot vertical line at user's position
-    ax.axvline(x=data_position, ymin=0.2, ymax=0.8, color='black', linewidth=3, linestyle='-')
-    
-    # Add text label for user's footprint (adjusted to use proper coordinates)
-    plt.text(0.5, 0.1, f'Your Footprint: {user_footprint:.1f} tonnes CO₂e\n{footprint_position}', 
-             ha='center', va='center', fontweight='bold', transform=ax.transAxes)
-    
-    plt.suptitle('Your Carbon Footprint Performance', fontsize=16)
-    plt.title(f'How your operations compare to industry benchmarks', fontsize=12)
-    plt.axis('off')  # Hide the axis
-    
-    scale_chart_path = os.path.join(plots_dir, f'scale_chart_{uid}.png')
-    plt.savefig(scale_chart_path)
-    plt.close()
-    
-    # Convert file paths to URLs
-    media_url = settings.MEDIA_URL
-    pie_chart_url = f"{media_url}emission_plots/pie_chart_{uid}.png"
-    trend_chart_url = f"{media_url}emission_plots/trend_chart_{uid}.png"
-    scale_chart_url = f"{media_url}emission_plots/scale_chart_{uid}.png"
-    
-    # Pass the chart URLs and JSON data to the template
-    context = {
+    return render(request, 'Calculator/Results.html', {
         'emission': emission,
-        'pie_chart_url': pie_chart_url,
-        'trend_chart_url': trend_chart_url,
-        'scale_chart_url': scale_chart_url,
         'chart_data_json': chart_data_json
-    }
-    
-    return render(request, 'Calculator/Results.html', context)
+    })
 
 @login_required
 def past_projects(request):
@@ -761,8 +678,8 @@ def past_projects(request):
     projects = CarbonEmission.objects.filter(user=request.user)
     
     # Apply search filter if a search query exists
-    if search_query:
-        projects = projects.filter(financial_year__icontains=search_query)
+    if (search_query):
+        projects = projects.filter(financial_year__icontains(search_query))
     
     # For each project, prepare explosives and transport data to display
     for project in projects:
@@ -785,7 +702,7 @@ def delete_project(request, financial_year):
     emission = get_object_or_404(CarbonEmission, financial_year=financial_year, user=request.user)
     
     # Check if the user owns this emission data
-    if emission.user != request.user:
+    if (emission.user != request.user):
         messages.error(request, "You don't have permission to delete this project.")
         return redirect('Model:past_projects')
         
@@ -796,10 +713,10 @@ def delete_project(request, financial_year):
     emission.delete()
     
     # Also clear any session data related to this emission
-    if f'explosive_details_{financial_year_value}' in request.session:
+    if (f'explosive_details_{financial_year_value}' in request.session):
         del request.session[f'explosive_details_{financial_year_value}']
     
-    if f'transport_details_{financial_year_value}' in request.session:
+    if (f'transport_details_{financial_year_value}' in request.session):
         del request.session[f'transport_details_{financial_year_value}']
     
     messages.success(request, f"Project '{financial_year_value}' has been deleted successfully.")

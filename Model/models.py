@@ -17,20 +17,20 @@ class Constants(models.Model):
     )
     mine_type = models.CharField(max_length=20, choices=MINE_TYPE_CHOICES, default='open-cast')
     # Coal type conversion factors
-    anthracite_cf = models.FloatField(default=26.8)
+    anthracite_cf = models.FloatField(default=26.7)
     bituminous_nc_cf = models.FloatField(default=25.8)
     bituminous_c_cf = models.FloatField(default=25.8)
-    lignite_cf = models.FloatField(default=(14.1))
+    lignite_cf = models.FloatField(default=11.9)
     subbituminous_cf = models.FloatField(default=18.9)
     conv_fact = models.FloatField(default=4.1868)
-    exclusion_fact = models.FloatField(default=0.17)
+    exclusion_fact = models.FloatField(default=0.017)
     
     # Carbon content
-    anthracite_cc = models.FloatField(default=26.8)
-    bituminous_nc_cc = models.FloatField(default=25.8)
-    bituminous_c_cc = models.FloatField(default=25.8)
-    lignite_cc = models.FloatField(default=27.6)
-    subbituminous_cc = models.FloatField(default=26.2)
+    anthracite_cc = models.FloatField(default=98.300)
+    bituminous_nc_cc = models.FloatField(default=94.600)
+    bituminous_c_cc = models.FloatField(default=94.600)
+    lignite_cc = models.FloatField(default=101.000)
+    subbituminous_cc = models.FloatField(default=96.100)
     
     # Carbon Oxidation Factors
     anthracite_cof = models.FloatField(default=0.98)
@@ -38,31 +38,23 @@ class Constants(models.Model):
     bituminous_c_cof = models.FloatField(default=0.98)
     lignite_cof = models.FloatField(default=0.98)
     subbituminous_cof = models.FloatField(default=0.98)
-    
-    # Methane emissions
-    # anthracite_ch4 = models.FloatField(default=0.3)
-    # bituminous_nc_ch4 = models.FloatField(default=0.3)
-    # bituminous_c_ch4 = models.FloatField(default=0.3)
-    # lignite_ch4 = models.FloatField(default=0.1)
-    # subbituminous_ch4 = models.FloatField(default=0.2)
-    
-    
+    methane_emission_factor = models.FloatField(default=0.00067, help_text="Methane emission factor (conversion to CO₂e)")
     
     # Equipment emissions
-    diesel_ef = models.FloatField(default=2.68)
-    petrol_ef = models.FloatField(default=2.31)
+    diesel_ef = models.FloatField(default=0.00268)
+    petrol_ef = models.FloatField(default=0.00231)
     
     # Electricity
-    grid_emission_factor = models.FloatField(default=0.82)
+    grid_emission_factor = models.FloatField(default=0.708)
     
     # Carbon sequestration
-    carbon_sequesteration_rate = models.FloatField(default=10.0)
+    carbon_sequesteration_rate = models.FloatField(default=3.5)
     
     # Open cast mine specific
-    overburden_ef = models.FloatField(default=0.5)
-    csl = models.FloatField(default=0.5)
+    overburden_ef = models.FloatField(default=0.00025)
+    csl = models.FloatField(default=750)
     # Waste
-    waste_ef = models.FloatField(default=0.5)
+    waste_ef = models.FloatField(default=0.005)
     
     class Meta:
         verbose_name = "Constants"
@@ -148,6 +140,9 @@ class CarbonEmission(models.Model):
     # Add a new field to store JSON data for detailed values
     _meta_data = models.TextField(blank=True, null=True, default='{}')
     
+    # Add a new field to store weights for each transport type (JSON string)
+    transport_weights = models.TextField(blank=True, null=True, default='{}')
+    
     @property
     def meta_data(self):
         """Get the meta data as a dictionary"""
@@ -170,6 +165,29 @@ class CarbonEmission(models.Model):
         except Exception as e:
             print(f"Error saving meta_data: {e}")
             self._meta_data = '{}'
+    
+    @property
+    def transport_weights_dict(self):
+        """Get the transport weights as a dictionary"""
+        if not self.transport_weights:
+            return {}
+        try:
+            return json.loads(self.transport_weights)
+        except Exception as e:
+            print(f"Error parsing transport_weights JSON: {e}")
+            return {}
+
+    @transport_weights_dict.setter
+    def transport_weights_dict(self, value):
+        """Save the transport weights from a dictionary"""
+        try:
+            if value is None:
+                self.transport_weights = '{}'
+            else:
+                self.transport_weights = json.dumps(value)
+        except Exception as e:
+            print(f"Error saving transport_weights: {e}")
+            self.transport_weights = '{}'
     
     class Meta:
         verbose_name = "Carbon Emission"

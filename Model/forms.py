@@ -74,6 +74,7 @@ class Configure_Constants_Input(forms.ModelForm):
             'overburden_ef': forms.NumberInput(attrs={'id':'overburden_ef','placeholder':'Enter overburden emission factor'}),
             'csl': forms.NumberInput(attrs={'id':'csl','placeholder':'Enter carbon stock loss '}),
             'waste_ef': forms.NumberInput(attrs={'id':'waste_ef','placeholder':'Enter waste emission factor'}),
+            'methane_emission_factor': forms.NumberInput(attrs={'id':'methane_emission_factor','placeholder':'Enter methane emission factor'}),
         }
 
 class CalculatorForm(forms.ModelForm):
