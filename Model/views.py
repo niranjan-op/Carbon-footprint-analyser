@@ -282,7 +282,8 @@ def Calculator(request):
                 print("Initial Carbon_footprint after Carbon_Production:", Carbon_footprint)
 
                 if (mine_type == 'open_cast'):
-                    Carbon_footprint += np.multiply(emission.overburden_removed, constants.overburden_ef)
+                    emission.overburden_emissions= np.multiply(emission.overburden_removed, constants.overburden_ef)
+                    Carbon_footprint += emission.overburden_emissions
                     print("After overburden:", Carbon_footprint)
                     Carbon_footprint += np.multiply(emission.land_disturbance, constants.csl)
                     print("After land disturbance:", Carbon_footprint)
@@ -304,7 +305,8 @@ def Calculator(request):
                 print("After electricity:", Carbon_footprint)
 
                 # Waste:
-                Carbon_footprint += WasteEmissions(emission.waste, constants.waste_ef)
+                emission.waste_emissions = WasteEmissions(emission.waste, constants.waste_ef)
+                Carbon_footprint += emission.waste_emissions
                 print("After waste:", Carbon_footprint)
                 Carbon_footprint += total_explosive_emissions + total_transport_emissions
                 print("Final Carbon_footprint:", Carbon_footprint)
