@@ -30,8 +30,8 @@ MineFootprint is a web-based platform designed to help coal mining operations tr
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/Carbon-footprint-analyser.git
-   cd Carbon-footprint-analyser
+   git clone https://github.com/yourusername/MineFootprint.git
+   cd MineFootprint
    ```
 
 2. **Install dependencies:**
