@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-910)d_2pmy&18l5-+q-v9f3*4hx(d1(ck%_yms7!y+ye*ridiq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['MineFootprint.onrender.com']
+ALLOWED_HOSTS = ['MineFootprint.onrender.com','127.0.0.1']
 
 
 # Application definition
@@ -59,7 +59,7 @@ ROOT_URLCONF = 'Trial.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'Templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
