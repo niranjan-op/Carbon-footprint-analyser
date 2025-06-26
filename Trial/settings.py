@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'Trial.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Remove this hardcoded DATABASE_URL (major security risk)
-# DATABASE_URL = 'postgresql://minefootprint_user:reXqi5AO7sLeMacooXd8o2bFmO77nnvs@dpg-d1edff2li9vc739u964g-a/minefootprint'
+# DATABASE_URL = 'postgresql://minefootprint_user:reXqi5AO7sLeMacooXd8o2bFmO77nnvs@dpg-d1edff2li9vc739u964g-a.singapore-postgres.render.com/minefootprint'
 
 # Database configuration - CORRECTED VERSION
 DATABASES = {
