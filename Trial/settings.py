@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'Trial.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASE_URL = postgresql://minefootprint_user:reXqi5AO7sLeMacooXd8o2bFmO77nnvs@dpg-d1edff2li9vc739u964g-a/minefootprint
+DATABASE_URL = 'postgresql://minefootprint_user:reXqi5AO7sLeMacooXd8o2bFmO77nnvs@dpg-d1edff2li9vc739u964g-a/minefootprint'
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
