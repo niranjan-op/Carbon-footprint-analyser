@@ -60,7 +60,10 @@ ROOT_URLCONF = 'Trial.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'Templates'],  # Changed from os.path.join to Path notation
+        'DIRS': [
+            BASE_DIR / 'Templates',           # Project-wide templates
+            BASE_DIR / 'templates',           # Alternative lowercase directory
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,9 +72,30 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            # Add debug information for template loading
+            'debug': DEBUG,
         },
     },
 ]
+
+# Add template debugging for development
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.template': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
 
 WSGI_APPLICATION = 'Trial.wsgi.application'
 
