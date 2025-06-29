@@ -1,5 +1,8 @@
 # MineFootprint: Carbon Footprint Analyser for Coal Mines
 
+Link to the website 👉
+<a href="https://minefootprint.onrender.com/">Mine footprint</a>
+
 MineFootprint is a web-based platform designed to help coal mining operations track, analyze, and reduce their carbon footprint. It provides detailed, mine-specific carbon emission calculations, visualizations, and actionable insights, with a focus on Indian mining practices.
 
 ## Features
