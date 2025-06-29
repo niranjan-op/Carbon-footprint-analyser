@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | MineFootprint</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/aboutus.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="company-name">
+            <a href="{% url 'home' %}">MineFootprint</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">About Us</h1>
+        
+        <div class="about-intro">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> Our Mission</h2>
+            <p>At MineFootprint, we are dedicated to helping coal mining operations track, understand, and reduce their carbon footprint. Our platform offers comprehensive tools for accurate emission measurement and analysis, empowering mining companies to make environmentally responsible decisions.</p>
+        </div>
+        
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-fire"></i> The Environmental Impact of Coal Mining</h2>
+            <p>Coal mining operations release significant amounts of greenhouse gases, including carbon dioxide (CO₂) and methane (CH₄), both of which trap heat and accelerate global warming. As the second-largest coal producer globally, India depends heavily on coal for energy, but this comes with severe environmental consequences.</p>
+            
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="fas fa-smog"></i></div>
+                    <h3>Carbon Dioxide Emissions</h3>
+                    <p>Coal mining emits CO₂ through diesel-powered equipment, blasting operations, fossil fuel-based electricity, and transportation. The energy sector, largely driven by coal, is responsible for nearly 40% of global CO₂ emissions.</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="fas fa-wind"></i></div>
+                    <h3>Methane Release</h3>
+                    <p>Coal mining releases methane, a greenhouse gas 80 times more potent than CO₂ over a 20-year period. It comes from coal seams, ventilation systems, and abandoned mines that continue leaking methane long after operations cease.</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="fas fa-tree"></i></div>
+                    <h3>Deforestation</h3>
+                    <p>Open-cast mining leads to massive deforestation, reducing Earth's ability to absorb CO₂ naturally. This results in biodiversity loss, soil erosion, and degradation, making land unsuitable for agriculture.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Shortcomings in Current Models</h2>
+            <p>Current carbon footprint calculation models suffer from significant limitations that prevent accurate measurement:</p>
+            
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="fas fa-ruler-combined"></i></div>
+                    <h3>Static Emission Factors</h3>
+                    <p>Existing models rely on generic emission factors that fail to account for regional variations in coal properties and mine-specific conditions.</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="fas fa-puzzle-piece"></i></div>
+                    <h3>Incomplete Emission Sources</h3>
+                    <p>Most models overlook critical sources like post-mining methane leakage, Scope 3 emissions, and fugitive methane from underground operations.</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon"><i class="far fa-clock"></i></div>
+                    <h3>Lack of Real-Time Data</h3>
+                    <p>Traditional models rely on annual production figures rather than continuous monitoring, resulting in delayed and potentially inaccurate emissions reporting.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-lightbulb"></i> Our Solution</h2>
+            <p>Our carbon footprint analyzer addresses these shortcomings through an advanced, mine-specific approach that includes comprehensive data collection, mine-specific variables, real-time monitoring, differentiated analysis for different mine types, actionable insights, and India-focused parameters.</p>
+            
+            <p>With our solution, coal mining operations can track and quantify emissions based on detailed activity-wise data, visualize emission trends, compare emission levels across different mines, improve regulatory compliance, develop targeted reduction strategies, and demonstrate environmental responsibility to stakeholders.</p>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> How We Calculate Carbon Footprint</h2>
+            
+            <p>To determine the carbon footprint of coal mining, we begin by defining assessment boundaries, including operational scope, geographical limits, and time frame. Our calculation encompasses emissions from mining, energy use, transportation, and waste management.</p>
+            
+            <h3>Emission Calculation Methodology</h3>
+            
+            <div class="methodology-grid">
+                <div class="methodology-card">
+                    <h3>1. Coal Production Emissions</h3>
+                    <p>We estimate CO₂ emissions by multiplying annual coal output with factors for energy content, exclusions, and CO₂ per energy unit.</p>
+                </div>
+                
+                <div class="methodology-card">
+                    <h3>2. Mine-Type Emissions</h3>
+                    <ul>
+                        <li><strong>Open-Cast Mines:</strong> We account for diesel used in overburden removal and carbon loss from land disturbance.</li>
+                        <li><strong>Underground Mines:</strong> We calculate methane (CH₄) emissions, converted to CO₂ equivalents using global warming potential (GWP).</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h3>3. Equipment & Fuel Emissions</h3>
+                    <p>We include CO₂ from diesel machinery, explosives, and electricity, factoring in regional emission rates.</p>
+                </div>
+                
+                <div class="methodology-card">
+                    <h3>4. Transportation Emissions</h3>
+                    <p>We use transport mode-specific factors to calculate emissions from coal and waste transport distances.</p>
+                </div>
+                
+                <div class="methodology-card">
+                    <h3>5. Waste Management</h3>
+                    <p>We address emissions from refuse transport and disposal.</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <p>Finally, we sum emissions across all stages, adjusting for region-specific factors and uncertainties for accurate, repeatable results. This method ensures detailed tracking of emissions and encourages transparency in carbon footprint assessments.</p>
+            </div>
+            
+            <h3>Formulae We Use</h3>
+            
+            <div class="formula-box">
+                <div class="formula-title">Land disturbance:</div>
+                <div class="formula">CO₂ = Area Disturbed (ha) × Carbon Stock Loss (tonnes CO₂/ha)</div>
+                <p class="formula-explanation">When mining operations disturb land, stored carbon in soil and vegetation is released as CO₂. This formula calculates these emissions by multiplying the disturbed area by a region-specific carbon stock loss factor.</p>
+            </div>
+            
+            <div class="formula-box">
+                <div class="formula-title">Methane emissions:</div>
+                <div class="formula">CO₂ = CH₄ released (m³) × Methane Emission Factor × (16.04 / 22.914) × 1000</div>
+                <div class="formula-note">Where 16.04 is the molecular weight of methane and 22.914 is the molar volume at standard conditions</div>
+                <p class="formula-explanation">Methane is a potent greenhouse gas with higher warming potential than CO₂. This formula converts methane volume to CO₂ equivalent by applying the molecular weight conversion and a methane-specific emission factor that accounts for its global warming potential.</p>
+            </div>
+            
+            <h3>Equipment & Fuel Emission:</h3>
+            
+            <div class="formula-box">
+                <div class="formula-title">A) Diesel Powered Machinery:</div>
+                <div class="formula">CO₂ = Diesel Used (liters) × Avg Emission Factor for all machines (kg CO₂/liter)</div>
+                <p class="formula-explanation">Mining equipment running on diesel emits CO₂ during combustion. This formula calculates these emissions by multiplying fuel consumption by an equipment-specific emission factor that accounts for engine efficiency and fuel carbon content.</p>
+            </div>
+            
+            <div class="formula-box">
+                <div class="formula-title">B) Explosives:</div>
+                <div class="formula">CO₂ = Explosives Used (kg) × Emission Factor (kg CO₂/kg)</div>
+                <p class="formula-explanation">Explosives release CO₂ during detonation from chemical reactions. This formula calculates these emissions by multiplying the quantity of explosives by their specific emission factor, which varies by explosive type (e.g., ANFO, dynamite).</p>
+            </div>
+            
+            <div class="formula-box">
+                <div class="formula-title">C) Electricity Used:</div>
+                <div class="formula">CO₂ = Electricity (MWh) × Grid Emission Factor (kg CO₂/MWh)</div>
+                <p class="formula-explanation">Electricity consumption contributes to indirect emissions. This formula calculates these emissions by multiplying electricity usage by a grid emission factor that reflects the carbon intensity of the regional power generation mix.</p>
+            </div>
+            
+            <div class="formula-box">
+                <div class="formula-title">Transport:</div>
+                <div class="formula">CO₂ = Distance (km) × Coal Weight (tonnes) × Emission Factor (kg CO₂/tonne km)</div>
+                <p class="formula-explanation">Transporting coal and materials produces emissions based on distance, weight, and vehicle type. This formula calculates transport emissions by multiplying distance traveled and material weight by a transport mode-specific emission factor.</p>
+            </div>
+            
+            <div class="formula-box">
+                <div class="formula-title">Carbon Sequestration Potential:</div>
+                <div class="formula">CO₂ = Area reforested (ha) × Carbon Sequestration Rate (tonnes CO₂/ha/year)</div>
+                <p class="formula-explanation">Reforestation and vegetation restoration can offset carbon emissions. This formula estimates the carbon sequestration potential by multiplying the reforested area by a sequestration rate that accounts for regional vegetation types and growth rates.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Highlight current page in navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

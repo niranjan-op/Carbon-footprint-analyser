@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Results</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/Results_styles.css' %}">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include plugin for annotations -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+</head>
+<body>
+    <nav>
+        <ul class="nav-left">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="{% url 'Model:Calculator' %}">Carbon Footprint Analyser</a></li>
+        </ul>
+        <ul class="nav-right">
+            {% if user.is_authenticated %}
+                <li><span class="username">Welcome, {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% if not user.is_authenticated %}
+        {% include 'alerts/login_required_alert.html' %}
+        {% endif %}
+        
+        <div class="results-header">
+            <h1>Carbon Footprint Analysis Results</h1>
+            <p class="timestamp">Analysis performed on: {{ emission.calculation_date|date:"F d, Y H:i" }}</p>
+        </div>
+
+        <div class="results-summary">
+            <div class="summary-card total">
+                <h2>Total Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Carbon_footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e</span>
+                </div>
+            </div>
+            
+            <div class="summary-card per-tonne">
+                <h2>Net Carbon Footprint</h2>
+                <div class="result-value">
+                    <span class="number">{{ emission.Net_Carbon_Footprint|floatformat:2 }}</span>
+                    <span class="unit">tonnes CO₂e/tonne</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart.js Visualization Section -->
+        <div class="visualization-section">
+            <h2>Carbon Footprint Visualizations</h2>
+            
+            <div class="vis-grid">
+                <!-- Pie chart showing emission sources -->
+                <div class="vis-card">
+                    <h3>Emission Sources</h3>
+                    <div class="vis-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Line chart showing historical trend -->
+                <div class="vis-card">
+                    <h3>Historical Trend</h3>
+                    <div class="vis-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Scale visualization showing footprint comparison with improved header -->
+                <div class="vis-card scale-container">
+                    <div class="scale-header">
+                        <h3>Carbon Footprint Industry Benchmark Scale</h3>
+                        <p id="footprint-context">Your mine's carbon footprint of <span id="footprint-value">{{ emission.Carbon_footprint|floatformat:2 }}</span> tonnes CO₂e 
+                           is <span id="footprint-position"></span>.</p>
+                    </div>
+                    <div class="vis-container">
+                        <canvas id="scaleChart"></canvas>
+                    </div>
+                    <div id="scale-legend" class="scale-legend">
+                        <div class="legend-item">
+                            <span class="color-box low-impact"></span>
+                            <span class="legend-text">Low Impact (100,000 tonnes)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="color-box below-avg"></span>
+                            <span class="legend-text">Below Average (100k-250k)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="color-box average"></span>
+                            <span class="legend-text">Industry Average (250k-500k)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="color-box above-avg"></span>
+                            <span class="legend-text">Above Average (500k-1M)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="color-box high-impact"></span>
+                            <span class="legend-text">High Impact (>1M tonnes)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detailed-results">
+            <h2>Detailed Results</h2>
+            
+            <div class="results-section">
+                <h3>Coal Production Emissions</h3>
+                <table class="results-table">
+                    <tr>
+                        <th>Coal Type</th>
+                        <th>Amount (tonnes)</th>
+                    </tr>
+                    {% if emission.anthracite > 0 %}
+                    <tr>
+                        <td>Anthracite</td>
+                        <td>{{ emission.anthracite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Coking)</td>
+                        <td>{{ emission.bituminous_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.bituminous_non_coking > 0 %}
+                    <tr>
+                        <td>Bituminous (Non-Coking)</td>
+                        <td>{{ emission.bituminous_non_coking|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.subbituminous > 0 %}
+                    <tr>
+                        <td>Subbituminous</td>
+                        <td>{{ emission.subbituminous|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.lignite > 0 %}
+                    <tr>
+                        <td>Lignite</td>
+                        <td>{{ emission.lignite|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            <div class="results-section">
+                <h3>Operational Emissions</h3>
+                <table class="results-table">
+                    {% if emission.diesel_used > 0 %}
+                    <tr>
+                        <td>Diesel Used</td>
+                        <td>{{ emission.diesel_used }} liters</td>
+                        <td>{{ emission.diesel_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.petrol_used > 0 %}
+                    <tr>
+                        <td>Petrol Used</td>
+                        <td>{{ emission.petrol_used|floatformat:2 }} liters</td>
+                        <td>{{ emission.petrol_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.electricity_used > 0 %}
+                    <tr>
+                        <td>Electricity Used</td>
+                        <td>{{ emission.electricity_used|floatformat:2 }} MWh</td>
+                        <td>{{ emission.electricity_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.explosive_emissions > 0 %}
+                    <tr>
+                        <td>Explosives</td>
+                        <td>Various</td>
+                        <td>{{ emission.explosive_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.transport_emissions > 0 %}
+                    <tr>
+                        <td>Transportation</td>
+                        <td>Various</td>
+                        <td>{{ emission.transport_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            {% if emission.overburden_removed > 0 or emission.land_disturbance > 0 %}
+            <div class="results-section">
+                <h3>Open Cast Mining Impacts</h3>
+                <table class="results-table">
+                    {% if emission.overburden_removed > 0 %}
+                    <tr>
+                        <td>Overburden Removed</td>
+                        <td>{{ emission.overburden_removed|floatformat:2 }} m³</td>
+                        <td>{{ emission.overburden_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                    {% endif %}
+                    {% if emission.land_disturbance > 0 %}
+                    <tr>
+                        <td>Land Disturbance</td>
+                        <td>{{ emission.land_disturbance|floatformat:2 }} hectares</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.total_ch4 > 0 %}
+            <div class="results-section">
+                <h3>Underground Mining Impacts</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Methane Emissions</td>
+                        <td>{{ emission.total_ch4|floatformat:2 }} m³</td>
+                        <td>{{ emission.methane_emissions|floatformat:2 }} kg CO₂e</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.waste > 0 %}
+            <div class="results-section">
+                <h3>Waste Management</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Waste Generated</td>
+                        <td>{{ emission.waste|floatformat:2 }} tonnes</td>
+                        <td>Impact included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if emission.sequestration > 0 %}
+            <div class="results-section positive-impact">
+                <h3>Carbon Sequestration</h3>
+                <table class="results-table">
+                    <tr>
+                        <td>Area Reforested</td>
+                        <td>{{ emission.sequestration|floatformat:2 }} hectares</td>
+                        <td>Carbon offset included in total</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="recommendations">
+            <h2>Recommendations</h2>
+            <div class="recommendation-card">
+                <h3>Reduce Emissions</h3>
+                <ul>
+                    <li>Consider investing in more efficient equipment to reduce diesel and petrol consumption</li>
+                    <li>Explore renewable energy options to reduce reliance on grid electricity</li>
+                    <li>Optimize transportation routes and vehicles to minimize transport emissions</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h3>Offset Carbon Footprint</h3>
+                <ul>
+                    <li>Increase reforestation efforts in disturbed areas</li>
+                    <li>Invest in certified carbon offset projects</li>
+                    <li>Implement progressive rehabilitation practices</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="button back-button">
+                <span class="button-icon">←</span>
+                <span class="button-text">Back</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}" class="button">New Calculation</a>
+            <a href="{% url 'Model:Configure_Constants' %}?emission_id={{ emission.financial_year }}" class="config-button">
+                <span class="button-text">Configure Constants</span>
+                <span class="button-icon">⚙️</span>
+            </a>
+            <a href="{% url 'Model:Calculator' %}?financial_year={{emission.financial_year}}" class="button edit-button">View/Edit Input Values</a>
+            <button class="button print-button" onclick="window.print()">Print Results</button>
+        </div>
+    </div>
+
+    <!-- Hidden inputs to store emission values for JavaScript -->
+    <input type="hidden" id="chartData" value="{{ chart_data_json }}">
+    <input type="hidden" id="coalEmissions" value="{{ emission.coal_emissions|default:0 }}">
+    <input type="hidden" id="dieselEmissions" value="{{ emission.diesel_emissions|default:0 }}">
+    <input type="hidden" id="petrolEmissions" value="{{ emission.petrol_emissions|default:0 }}">
+    <input type="hidden" id="explosiveEmissions" value="{{ emission.explosive_emissions|default:0 }}">
+    <input type="hidden" id="electricityEmissions" value="{{ emission.electricity_emissions|default:0 }}">
+    <input type="hidden" id="transportEmissions" value="{{ emission.transport_emissions|default:0 }}">
+    <input type="hidden" id="methaneEmissions" value="{{ emission.methane_emissions|default:0 }}">
+    <input type="hidden" id="overburdenEmissions" value="{{ emission.overburden_emissions|default:0 }}">
+    <input type="hidden" id="wasteEmissions" value="{{ emission.waste|default:0 }}">
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse the JSON data from the server
+        let chartData = {};
+        try {
+            chartData = JSON.parse(document.getElementById('chartData').value);
+        } catch (e) {
+            console.error("Error parsing chart data:", e);
+            chartData = {
+                pieChart: {labels: [], values: []},
+                trendChart: {years: [], values: [], is_actual: []},
+                scaleChart: {
+                    lowFootprint: 100000, 
+                    belowAvg: 250000,
+                    avgFootprint: 500000, 
+                    aboveAvg: 1000000,
+                    highFootprint: 1000000, 
+                    userFootprint: 0,
+                    footprintPosition: "calculating..."
+                }
+            };
+        }
+        
+        // Create an expanded color palette for more transport types
+        const extendedColors = [
+            // Base colors
+            '#4CAF50', '#2196F3', '#FFC107', '#FF5722',
+            '#9C27B0', '#607D8B', '#E91E63', '#03A9F4', 
+            // Transport-specific colors (more blue/green variants)
+            '#00796B', '#006064', '#01579B', '#0D47A1',
+            '#1A237E', '#1B5E20', '#33691E', '#2E7D32',
+            '#00838F', '#0277BD', '#0097A7', '#00695C',
+            // Additional colors if needed
+            '#8BC34A', '#FF9800', '#795548', '#C2185B'
+        ];
+        
+        // Group the labels - collect all transport types
+        const transportLabels = [];
+        const transportData = [];
+        const nonTransportLabels = [];
+        const nonTransportData = [];
+        
+        chartData.pieChart.labels.forEach((label, index) => {
+            if (label.startsWith('Transport:')) {
+                transportLabels.push(label.replace('Transport:', '').trim());
+                transportData.push(chartData.pieChart.values[index]);
+            } else {
+                nonTransportLabels.push(label);
+                nonTransportData.push(chartData.pieChart.values[index]);
+            }
+        });
+        
+        // Create pie chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: chartData.pieChart.labels,
+                datasets: [{
+                    data: chartData.pieChart.values,
+                    backgroundColor: extendedColors.slice(0, chartData.pieChart.labels.length),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Emission Sources',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        // Shorten transport labels for better display
+                                        const displayLabel = label.startsWith('Transport:') 
+                                            ? label.replace('Transport:', '🚚').trim() 
+                                            : label;
+                                        
+                                        return {
+                                            text: displayLabel,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(data.datasets[0].data[i]) || data.datasets[0].data[i] === 0,
+                                            lineCap: 'butt',
+                                            lineDash: [],
+                                            lineDashOffset: 0,
+                                            lineJoin: 'miter',
+                                            lineWidth: 1,
+                                            strokeStyle: '#fff',
+                                            pointStyle: 'circle',
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const title = tooltipItems[0].label || '';
+                                // Show full transport label in tooltip title
+                                return title;
+                            },
+                            label: function(context) {
+                                const value = context.raw;
+                                // Show value with 2 decimal places and units
+                                return value.toFixed(2) + ' tonnes CO₂e';
+                            },
+                            afterLabel: function(context) {
+                                // Add weight information for transport items
+                                const label = context.label || '';
+                                if (label.startsWith('Transport:')) {
+                                    return 'Includes weight of coal carried';
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Create trend chart with visual distinction between actual and estimated data
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        
+        // Separate actual data and estimated data
+        const actualYears = [];
+        const actualValues = [];
+        const estimatedYears = [];
+        const estimatedValues = [];
+        
+        for (let i = 0; i < chartData.trendChart.years.length; i++) {
+            if (chartData.trendChart.is_actual[i]) {
+                actualYears.push(chartData.trendChart.years[i]);
+                actualValues.push(chartData.trendChart.values[i]);
+            } else {
+                estimatedYears.push(chartData.trendChart.years[i]);
+                estimatedValues.push(chartData.trendChart.values[i]);
+            }
+        }
+        
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.trendChart.years,
+                datasets: [
+                    {
+                        label: 'Actual Emissions',
+                        data: chartData.trendChart.values.map((value, index) => 
+                            chartData.trendChart.is_actual[index] ? value : null),
+                        borderColor: 'rgba(33, 150, 243, 1)',
+                        backgroundColor: 'rgba(33, 150, 243, 0.2)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(33, 150, 243, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointStyle: 'circle',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Estimated Emissions',
+                        data: chartData.trendChart.values.map((value, index) => 
+                            !chartData.trendChart.is_actual[index] ? value : null),
+                        borderColor: 'rgba(156, 39, 176, 0.7)',
+                        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointBackgroundColor: 'rgba(156, 39, 176, 0.7)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointStyle: 'triangle',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Emissions Trend (Past 5 Years)',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const datasetIndex = context.datasetIndex;
+                                const dataIndex = context.dataIndex;
+                                const value = context.raw;
+                                
+                                if (value === null) return null;
+                                
+                                const label = context.dataset.label || '';
+                                return label + ': ' + value.toFixed(2) + ' tonnes CO₂e';
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Carbon Emissions (tonnes CO₂e)'
+                        },
+                        beginAtZero: false,
+                        ticks: {
+                            // Ensure we show enough ticks even with small datasets
+                            count: 6
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Financial Year'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+        
+        // Add data labels to the chart
+        chartData.trendChart.years.forEach((year, i) => {
+            const value = chartData.trendChart.values[i];
+            const isActual = chartData.trendChart.is_actual[i];
+            
+            // Get position coordinates for the point
+            const meta = trendChart.getDatasetMeta(isActual ? 0 : 1);
+            if (meta.data[i]) {
+                const position = meta.data[i].getCenterPoint();
+                
+                // Add annotation for the value
+                trendCtx.fillStyle = isActual ? 'rgba(33, 150, 243, 1)' : 'rgba(156, 39, 176, 0.7)';
+                trendCtx.font = '12px Arial';
+                trendCtx.textAlign = 'center';
+                trendCtx.fillText(value.toFixed(1), position.x, position.y - 15);
+            }
+        });
+        
+        // Update the footprint position text with the detailed assessment
+        document.getElementById('footprint-position').textContent = 
+            chartData.scaleChart.footprintPosition || "being calculated";
+        
+        // Create scale chart (horizontal bar with gradient and improved header)
+        const scaleCtx = document.getElementById('scaleChart').getContext('2d');
+        
+        // Create gradient with reduced width (changed from 600 to 350)
+        const gradient = scaleCtx.createLinearGradient(0, 0, 600, 0);
+        gradient.addColorStop(0, '#2ecc71');    // Green - Low Impact
+        gradient.addColorStop(0.25, '#a2d639'); // Light green - Below Average
+        gradient.addColorStop(0.5, '#f1c40f');  // Yellow - Industry Average
+        gradient.addColorStop(0.75, '#e67e22'); // Orange - Above Average
+        gradient.addColorStop(1, '#e74c3c');    // Red - High Impact
+        
+        // Get scale boundaries from the data
+        const lowFootprint = chartData.scaleChart.lowFootprint;
+        const belowAvg = chartData.scaleChart.belowAvg;
+        const avgFootprint = chartData.scaleChart.avgFootprint;
+        const aboveAvg = chartData.scaleChart.aboveAvg;
+        const highFootprint = chartData.scaleChart.highFootprint;
+        const userFootprint = chartData.scaleChart.userFootprint;
+        
+        // Create a logarithmic scale to handle wide range of values
+        const scaleMax = Math.max(highFootprint * 2, userFootprint * 1.5);
+        const scaleMin = Math.min(lowFootprint * 0.5, Math.max(1, userFootprint * 0.5));
+        
+        // Calculate the normalized position of user's footprint for visualization
+        // Using logarithmic scale to better visualize wide ranges
+        function normalizeLogScale(value) {
+            // Convert to log scale then normalize to 0-100
+            const logMin = Math.log10(scaleMin);
+            const logMax = Math.log10(scaleMax);
+            const logValue = Math.log10(Math.max(value, 1)); // Avoid log(0)
+            
+            return ((logValue - logMin) / (logMax - logMin)) * 100;
+        }
+        
+        const normalizedPosition = normalizeLogScale(userFootprint);
+        
+        // Create reference point markers for the scale chart
+        const referencePoints = chartData.scaleChart.referencePoints || [
+            {value: lowFootprint, label: "Low Impact", description: "Small mines with efficient operations"},
+            {value: belowAvg, label: "Below Average", description: "Moderate production with some emission controls"},
+            {value: avgFootprint, label: "Industry Average", description: "Typical medium-sized coal mine"},
+            {value: aboveAvg, label: "Above Average", description: "Larger mines with significant emissions"},
+            {value: highFootprint, label: "High Impact", description: "Major operations with limited emission controls"}
+        ];
+        
+        // Create annotations for each reference point
+        const scaleAnnotations = {};
+        
+        // Add the user's position marker
+        scaleAnnotations.userPosition = {
+            type: 'line',
+            scaleID: 'x',
+            value: normalizedPosition,
+            borderColor: '#000000',
+            borderWidth: 3,
+            label: {
+                enabled: true,
+                position: 'top',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                color: '#ffffff',
+                content: ['YOUR MINE', `${userFootprint.toLocaleString()} tonnes CO₂e`],
+                font: {
+                    weight: 'bold',
+                    size: 12
+                }
+            }
+        };
+        
+        // Add reference markers
+        referencePoints.forEach((point, index) => {
+            const normValue = normalizeLogScale(point.value);
+            scaleAnnotations[`ref${index}`] = {
+                type: 'line',
+                scaleID: 'x',
+                value: normValue,
+                borderColor: 'rgba(100,100,100,0.5)',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                label: {
+                    enabled: true,
+                    position: 'bottom',
+                    backgroundColor: 'rgba(255,255,255,0.7)',
+                    color: '#333',
+                    content: [point.label, point.value.toLocaleString()],
+                    font: {
+                        size: 10
+                    }
+                }
+            };
+        });
+        
+        // Create a dummy dataset with a bar representing the scale range
+        const scaleChart = new Chart(scaleCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Carbon Footprint Scale'],
+                datasets: [{
+                    label: 'Scale',
+                    data: [100],
+                    backgroundColor: gradient,
+                    barPercentage: 0.15,  // Make the bar narrower
+                    borderRadius: 5,      // Rounded corners
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    annotation: {
+                        annotations: scaleAnnotations
+                    },
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 100,
+                        grid: { display: false },
+                        ticks: {
+                            callback: function(v) {
+                                if (v === 0) return 'Low Impact';
+                                if (v === 25) return 'Below Avg';
+                                if (v === 50) return 'Industry Avg';
+                                if (v === 75) return 'Above Avg';
+                                if (v === 100) return 'High Impact';
+                            },
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    y: { display: false }
+                }
+            }
+        });
+        
+    });
+    </script>
+
+    <!-- Include the external JS file -->
+    <script src="{% static 'js/Results.js' %}"></script>
+
+    <style>
+        /* Visualization section styles */
+        .visualization-section {
+            margin: 30px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .visualization-section h2 {
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .vis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .vis-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .vis-card h3 {
+            color: #333;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .vis-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            height: 350px;
+            width: 100%;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 100% !important;
+        }
+
+        .full-width {
+            grid-column: 1 / -1; /* Span all columns */
+        }
+
+        /* New styles for scale chart with reduced width */
+        .scale-container {
+            max-width: 100%;
+            margin: 0 auto 20px;
+            grid-column: 1 / -1;
+        }
+        
+        @media (max-width: 768px) {
+            .scale-container {
+                max-width: 90%;
+            }
+        }
+
+        /* New styles for scale visualization */
+        .scale-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .scale-header p {
+            font-size: 1.1em;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        
+        #footprint-value, #footprint-position {
+            font-weight: bold;
+        }
+        
+        .scale-legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            padding: 0 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+        
+        .low-impact { background-color: #2ecc71; }
+        .below-avg { background-color: #a2d639; }
+        .average { background-color: #f1c40f; }
+        .above-avg { background-color: #e67e22; }
+        .high-impact { background-color: #e74c3c; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .vis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            .vis-card {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            
+            .visualization-section {
+                background: white;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</body>
+</html>
